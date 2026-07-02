@@ -47,13 +47,13 @@ Run the smallest meaningful validation for the changed surface.
 xcodebuild -project iosApp/iosApp.xcodeproj -scheme iosApp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build
 ```
 
-### Android-only code
+### Android target
 
 ```bash
-./gradlew :app:assembleDebug
+./gradlew :composeApp:compileDebugKotlinAndroid
 ```
 
-For Android feature-only changes, prefer the relevant feature unit test or assemble task when available.
+For Android runtime-sensitive Compose Multiplatform work, also install and smoke test the `composeApp` Android target on an emulator or device when available.
 
 ### Documentation or skill-only changes
 
