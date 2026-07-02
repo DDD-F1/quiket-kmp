@@ -4,11 +4,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.f1.quiket.composeapp.network.toUserFacingMessage
-import com.f1.quiket.composeapp.subject.ChapterWithParts
-import com.f1.quiket.composeapp.subject.PartDetail
-import com.f1.quiket.composeapp.subject.SubjectDetail
+import com.f1.quiket.composeapp.subject.domain.model.ChapterWithParts
+import com.f1.quiket.composeapp.subject.domain.model.PartDetail
+import com.f1.quiket.composeapp.subject.domain.model.SubjectDetail
 import com.f1.quiket.composeapp.subject.SubjectDetailUiState
-import com.f1.quiket.composeapp.subject.SubjectException
+import com.f1.quiket.composeapp.subject.domain.model.SubjectException
 import com.f1.quiket.composeapp.subject.domain.usecase.SubjectUseCases
 import com.f1.quiket.composeapp.subject.withRenamedChapter
 import com.f1.quiket.composeapp.subject.withUpdatedPart

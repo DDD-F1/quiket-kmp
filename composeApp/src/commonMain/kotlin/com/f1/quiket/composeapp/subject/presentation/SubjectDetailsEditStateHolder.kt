@@ -4,10 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.f1.quiket.composeapp.network.toUserFacingMessage
-import com.f1.quiket.composeapp.subject.Certificate
-import com.f1.quiket.composeapp.subject.CreatedSubject
-import com.f1.quiket.composeapp.subject.SubjectCreateInput
-import com.f1.quiket.composeapp.subject.SubjectException
+import com.f1.quiket.composeapp.subject.domain.model.Certificate
+import com.f1.quiket.composeapp.subject.domain.model.CreatedSubject
+import com.f1.quiket.composeapp.subject.domain.model.SubjectCreateInput
+import com.f1.quiket.composeapp.subject.domain.model.SubjectException
 import com.f1.quiket.composeapp.subject.domain.usecase.SubjectUseCases
 
 internal class SubjectDetailsEditStateHolder(

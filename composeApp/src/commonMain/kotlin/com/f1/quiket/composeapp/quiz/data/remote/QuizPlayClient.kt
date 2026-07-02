@@ -21,8 +21,8 @@ import com.f1.quiket.composeapp.quiz.domain.model.QuizSession
 import com.f1.quiket.composeapp.quiz.domain.model.QuizSubmitResult
 import com.f1.quiket.composeapp.quiz.domain.model.QuizTimerScope
 import com.f1.quiket.composeapp.quiz.domain.model.ServerQuizType
-import com.f1.quiket.composeapp.subject.ChapterWithParts
-import com.f1.quiket.composeapp.subject.PartSummary
+import com.f1.quiket.composeapp.subject.domain.model.ChapterWithParts
+import com.f1.quiket.composeapp.subject.domain.model.PartSummary
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header

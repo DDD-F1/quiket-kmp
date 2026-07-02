@@ -89,8 +89,8 @@ import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
 import com.f1.quiket.composeapp.quiz.domain.model.QuizScope
 import com.f1.quiket.composeapp.quiz.domain.model.ServerQuizType
 import com.f1.quiket.composeapp.quiz.presentation.QuizCreateStateHolder
-import com.f1.quiket.composeapp.subject.PartSummary
-import com.f1.quiket.composeapp.subject.SubjectListItem
+import com.f1.quiket.composeapp.subject.domain.model.PartSummary
+import com.f1.quiket.composeapp.subject.domain.model.SubjectListItem
 import com.f1.quiket.composeapp.util.hidePlatformKeyboard
 import io.github.alexzhirkevich.compottie.LottieCompositionSpec
 import io.github.alexzhirkevich.compottie.animateLottieCompositionAsState

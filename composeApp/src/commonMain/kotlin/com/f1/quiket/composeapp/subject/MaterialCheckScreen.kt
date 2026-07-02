@@ -1,5 +1,7 @@
 package com.f1.quiket.composeapp.subject
 
+import com.f1.quiket.composeapp.subject.domain.model.*
+
 import org.koin.compose.koinInject
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image

@@ -134,7 +134,7 @@ import com.f1.quiket.composeapp.quiz.QuizPlayRoute
 import com.f1.quiket.composeapp.quiz.QuizStartRoute
 import com.f1.quiket.composeapp.result.QuizResultRoute
 import com.f1.quiket.composeapp.review.ReviewRoute
-import com.f1.quiket.composeapp.subject.CreatedSubject
+import com.f1.quiket.composeapp.subject.domain.model.CreatedSubject
 import com.f1.quiket.composeapp.subject.SubjectCreateRoute
 import com.f1.quiket.composeapp.subject.SubjectDetailRoute
 import kotlinx.datetime.LocalDate

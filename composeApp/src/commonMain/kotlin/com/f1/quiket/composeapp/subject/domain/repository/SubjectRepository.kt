@@ -1,20 +1,20 @@
 package com.f1.quiket.composeapp.subject.domain.repository
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.subject.Certificate
-import com.f1.quiket.composeapp.subject.Chapter
-import com.f1.quiket.composeapp.subject.CreatedSubject
-import com.f1.quiket.composeapp.subject.LectureFileUploadType
-import com.f1.quiket.composeapp.subject.LectureUploadAccepted
-import com.f1.quiket.composeapp.subject.LectureUploadProgress
-import com.f1.quiket.composeapp.subject.PartDetail
-import com.f1.quiket.composeapp.subject.PartSplitMethod
-import com.f1.quiket.composeapp.subject.PartSplitPlan
+import com.f1.quiket.composeapp.subject.domain.model.Certificate
+import com.f1.quiket.composeapp.subject.domain.model.Chapter
+import com.f1.quiket.composeapp.subject.domain.model.CreatedSubject
+import com.f1.quiket.composeapp.subject.domain.model.LectureFileUploadType
+import com.f1.quiket.composeapp.subject.domain.model.LectureUploadAccepted
+import com.f1.quiket.composeapp.subject.domain.model.LectureUploadProgress
+import com.f1.quiket.composeapp.subject.domain.model.PartDetail
+import com.f1.quiket.composeapp.subject.domain.model.PartSplitMethod
+import com.f1.quiket.composeapp.subject.domain.model.PartSplitPlan
 import com.f1.quiket.composeapp.subject.PickedUploadFile
-import com.f1.quiket.composeapp.subject.SubjectCreateInput
-import com.f1.quiket.composeapp.subject.SubjectDetail
-import com.f1.quiket.composeapp.subject.SubjectExamSchedule
-import com.f1.quiket.composeapp.subject.SubjectListItem
+import com.f1.quiket.composeapp.subject.domain.model.SubjectCreateInput
+import com.f1.quiket.composeapp.subject.domain.model.SubjectDetail
+import com.f1.quiket.composeapp.subject.domain.model.SubjectExamSchedule
+import com.f1.quiket.composeapp.subject.domain.model.SubjectListItem
 
 internal interface SubjectRepository {
     suspend fun getSubjects(session: SessionSnapshot, page: Int = 0, size: Int = 50): List<SubjectListItem>

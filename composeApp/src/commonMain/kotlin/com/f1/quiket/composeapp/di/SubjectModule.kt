@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.subject.SubjectClient
+import com.f1.quiket.composeapp.subject.data.remote.SubjectClient
 import com.f1.quiket.composeapp.subject.data.remote.SubjectRemoteDataSource
 import com.f1.quiket.composeapp.subject.data.remote.SubjectRemoteDataSourceImpl
 import com.f1.quiket.composeapp.subject.data.repository.SubjectRepositoryImpl

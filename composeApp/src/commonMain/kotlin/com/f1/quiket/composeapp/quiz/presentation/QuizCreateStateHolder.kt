@@ -15,9 +15,9 @@ import com.f1.quiket.composeapp.quiz.domain.usecase.BuildQuizCreateRequestUseCas
 import com.f1.quiket.composeapp.quiz.domain.usecase.QuizPlayUseCases
 import com.f1.quiket.composeapp.quiz.toQuizNetworkAwareMessage
 import com.f1.quiket.composeapp.quiz.withQuizNetworkRetryGuide
-import com.f1.quiket.composeapp.subject.PartSummary
-import com.f1.quiket.composeapp.subject.SubjectException
-import com.f1.quiket.composeapp.subject.SubjectListItem
+import com.f1.quiket.composeapp.subject.domain.model.PartSummary
+import com.f1.quiket.composeapp.subject.domain.model.SubjectException
+import com.f1.quiket.composeapp.subject.domain.model.SubjectListItem
 import com.f1.quiket.composeapp.subject.domain.usecase.SubjectUseCases
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay

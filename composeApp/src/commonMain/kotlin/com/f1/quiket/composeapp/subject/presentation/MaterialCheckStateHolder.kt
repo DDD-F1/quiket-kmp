@@ -3,9 +3,9 @@ package com.f1.quiket.composeapp.subject.presentation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.f1.quiket.composeapp.subject.LectureUploadStatus
+import com.f1.quiket.composeapp.subject.domain.model.LectureUploadStatus
 import com.f1.quiket.composeapp.subject.MaterialCheckUiState
-import com.f1.quiket.composeapp.subject.SubjectException
+import com.f1.quiket.composeapp.subject.domain.model.SubjectException
 import com.f1.quiket.composeapp.subject.domain.usecase.SubjectUseCases
 import com.f1.quiket.composeapp.subject.toSubjectNetworkAwareMessage
 import com.f1.quiket.composeapp.subject.withSubjectNetworkRetryGuide

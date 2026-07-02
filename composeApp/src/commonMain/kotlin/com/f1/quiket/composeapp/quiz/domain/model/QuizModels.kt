@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.quiz.domain.model
 
-import com.f1.quiket.composeapp.subject.ChapterWithParts
+import com.f1.quiket.composeapp.subject.domain.model.ChapterWithParts
 
 internal class QuizPlayException(
     message: String,
