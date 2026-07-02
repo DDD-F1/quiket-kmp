@@ -1,16 +1,16 @@
 package com.f1.quiket.composeapp.quiz.data.remote
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.quiz.QuizCreateRequest
-import com.f1.quiket.composeapp.quiz.QuizGenerationAccepted
-import com.f1.quiket.composeapp.quiz.QuizGenerationProgress
+import com.f1.quiket.composeapp.quiz.domain.model.QuizCreateRequest
+import com.f1.quiket.composeapp.quiz.domain.model.QuizGenerationAccepted
+import com.f1.quiket.composeapp.quiz.domain.model.QuizGenerationProgress
 import com.f1.quiket.composeapp.quiz.QuizPlayClient
-import com.f1.quiket.composeapp.quiz.QuizPlaySession
-import com.f1.quiket.composeapp.quiz.QuizPlayType
-import com.f1.quiket.composeapp.quiz.QuizResultSubmit
-import com.f1.quiket.composeapp.quiz.QuizScope
-import com.f1.quiket.composeapp.quiz.QuizSession
-import com.f1.quiket.composeapp.quiz.QuizSubmitResult
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlaySession
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayType
+import com.f1.quiket.composeapp.quiz.domain.model.QuizResultSubmit
+import com.f1.quiket.composeapp.quiz.domain.model.QuizScope
+import com.f1.quiket.composeapp.quiz.domain.model.QuizSession
+import com.f1.quiket.composeapp.quiz.domain.model.QuizSubmitResult
 
 internal interface QuizPlayRemoteDataSource {
     suspend fun getQuizSession(session: SessionSnapshot, quizSessionId: String): QuizSession

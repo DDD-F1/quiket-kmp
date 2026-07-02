@@ -3,11 +3,11 @@ package com.f1.quiket.composeapp.quiz.presentation
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.f1.quiket.composeapp.quiz.QuizDifficulty
-import com.f1.quiket.composeapp.quiz.QuizPlayException
-import com.f1.quiket.composeapp.quiz.QuizQuestion
-import com.f1.quiket.composeapp.quiz.QuizSession
-import com.f1.quiket.composeapp.quiz.ServerQuizType
+import com.f1.quiket.composeapp.quiz.domain.model.QuizDifficulty
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayException
+import com.f1.quiket.composeapp.quiz.domain.model.QuizQuestion
+import com.f1.quiket.composeapp.quiz.domain.model.QuizSession
+import com.f1.quiket.composeapp.quiz.domain.model.ServerQuizType
 import com.f1.quiket.composeapp.quiz.domain.usecase.QuizPlayUseCases
 import com.f1.quiket.composeapp.quiz.toQuizNetworkAwareMessage
 

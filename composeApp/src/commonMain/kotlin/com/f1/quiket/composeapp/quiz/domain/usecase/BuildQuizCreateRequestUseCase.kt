@@ -1,10 +1,10 @@
 package com.f1.quiket.composeapp.quiz.domain.usecase
 
-import com.f1.quiket.composeapp.quiz.QuizCreateRequest
-import com.f1.quiket.composeapp.quiz.QuizDifficulty
-import com.f1.quiket.composeapp.quiz.QuizPlayMode
-import com.f1.quiket.composeapp.quiz.QuizTimerScope
-import com.f1.quiket.composeapp.quiz.ServerQuizType
+import com.f1.quiket.composeapp.quiz.domain.model.QuizCreateRequest
+import com.f1.quiket.composeapp.quiz.domain.model.QuizDifficulty
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayMode
+import com.f1.quiket.composeapp.quiz.domain.model.QuizTimerScope
+import com.f1.quiket.composeapp.quiz.domain.model.ServerQuizType
 
 internal class BuildQuizCreateRequestUseCase {
     operator fun invoke(

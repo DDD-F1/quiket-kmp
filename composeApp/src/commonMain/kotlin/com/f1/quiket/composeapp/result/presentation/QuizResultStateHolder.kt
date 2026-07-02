@@ -4,10 +4,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.f1.quiket.composeapp.network.toUserFacingMessage
-import com.f1.quiket.composeapp.quiz.QuizPlayException
-import com.f1.quiket.composeapp.quiz.QuizPlayLaunchConfig
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayException
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
 import com.f1.quiket.composeapp.quiz.domain.usecase.QuizPlayUseCases
-import com.f1.quiket.composeapp.quiz.toLaunchConfig
+import com.f1.quiket.composeapp.quiz.domain.model.toLaunchConfig
 import com.f1.quiket.composeapp.result.QuizResult
 import com.f1.quiket.composeapp.result.QuizResultException
 import com.f1.quiket.composeapp.result.domain.usecase.QuizResultUseCases

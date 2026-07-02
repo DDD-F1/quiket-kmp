@@ -62,9 +62,9 @@ import com.f1.quiket.composeapp.designsystem.QuiketNegative
 import com.f1.quiket.composeapp.designsystem.QuiketOrange500
 import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
-import com.f1.quiket.composeapp.quiz.QuizPlayLaunchConfig
-import com.f1.quiket.composeapp.quiz.QuizOption
-import com.f1.quiket.composeapp.quiz.matchesAnswerValue
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
+import com.f1.quiket.composeapp.quiz.domain.model.QuizOption
+import com.f1.quiket.composeapp.quiz.domain.model.matchesAnswerValue
 import com.f1.quiket.composeapp.result.presentation.QuizResultStateHolder
 import com.f1.quiket.composeapp.result.presentation.QuizResultUiState
 import kotlinx.coroutines.launch

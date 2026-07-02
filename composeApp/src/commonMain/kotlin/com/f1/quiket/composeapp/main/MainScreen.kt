@@ -129,7 +129,7 @@ import com.f1.quiket.composeapp.main.presentation.HomeUiState
 import com.f1.quiket.composeapp.main.presentation.MainStateHolder
 import com.f1.quiket.composeapp.main.presentation.MyPageUiState
 import com.f1.quiket.composeapp.quiz.QuizCreateRoute
-import com.f1.quiket.composeapp.quiz.QuizPlayLaunchConfig
+import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
 import com.f1.quiket.composeapp.quiz.QuizPlayRoute
 import com.f1.quiket.composeapp.quiz.QuizStartRoute
 import com.f1.quiket.composeapp.result.QuizResultRoute
