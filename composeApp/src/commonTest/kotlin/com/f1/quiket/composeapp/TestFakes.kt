@@ -1,13 +1,13 @@
 package com.f1.quiket.composeapp
 
-import com.f1.quiket.composeapp.auth.AuthTokenData
-import com.f1.quiket.composeapp.auth.AuthUser
-import com.f1.quiket.composeapp.auth.KakaoLoginResult
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
+import com.f1.quiket.composeapp.auth.domain.model.AuthUser
+import com.f1.quiket.composeapp.auth.domain.model.KakaoLoginResult
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.auth.EmailAvailability
-import com.f1.quiket.composeapp.auth.EmailVerificationSent
-import com.f1.quiket.composeapp.auth.PasswordResetRequested
-import com.f1.quiket.composeapp.auth.SignupData
+import com.f1.quiket.composeapp.auth.domain.model.EmailAvailability
+import com.f1.quiket.composeapp.auth.domain.model.EmailVerificationSent
+import com.f1.quiket.composeapp.auth.domain.model.PasswordResetRequested
+import com.f1.quiket.composeapp.auth.domain.model.SignupData
 import com.f1.quiket.composeapp.auth.domain.repository.AuthRepository
 import com.f1.quiket.composeapp.auth.domain.repository.SessionRepository
 

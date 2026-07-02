@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.auth.data.repository
 
-import com.f1.quiket.composeapp.auth.AuthTokenData
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.auth.SessionStore
 import com.f1.quiket.composeapp.auth.domain.repository.SessionRepository

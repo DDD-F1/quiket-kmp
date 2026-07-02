@@ -1,5 +1,19 @@
-package com.f1.quiket.composeapp.auth
+package com.f1.quiket.composeapp.auth.data.remote
 
+import com.f1.quiket.composeapp.auth.DeviceInfo
+import com.f1.quiket.composeapp.auth.SessionSnapshot
+import com.f1.quiket.composeapp.auth.domain.model.AuthException
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
+import com.f1.quiket.composeapp.auth.domain.model.AuthUser
+import com.f1.quiket.composeapp.auth.domain.model.EmailAvailability
+import com.f1.quiket.composeapp.auth.domain.model.EmailVerificationSent
+import com.f1.quiket.composeapp.auth.domain.model.KakaoAccountLinkRequired
+import com.f1.quiket.composeapp.auth.domain.model.KakaoLoginResult
+import com.f1.quiket.composeapp.auth.domain.model.KakaoNicknameRequired
+import com.f1.quiket.composeapp.auth.domain.model.PasswordResetRequested
+import com.f1.quiket.composeapp.auth.domain.model.SignupData
+import com.f1.quiket.composeapp.network.ApiEnvelope
+import com.f1.quiket.composeapp.network.ensureTrailingSlash
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -10,8 +24,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import com.f1.quiket.composeapp.network.ApiEnvelope
-import com.f1.quiket.composeapp.network.ensureTrailingSlash
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
@@ -395,69 +407,12 @@ private fun SessionSnapshot.authorizationHeader(): String? {
     return "$type $token"
 }
 
-internal class AuthException(
-    message: String,
-    val isUnauthorized: Boolean = false,
-    val code: String? = null,
-    val email: String? = null,
-    val failedLoginCount: Int? = null,
-    val resetCodeSent: Boolean? = null,
-) : Exception(message)
-
 private fun ApiEnvelope.toAuthErrorData(json: Json): AuthErrorDataResponse? {
     val element = data ?: return null
     return runCatching {
         json.decodeFromJsonElement<AuthErrorDataResponse>(element)
     }.getOrNull()
 }
-
-internal data class AuthTokenData(
-    val accessToken: String,
-    val refreshToken: String,
-    val tokenType: String,
-    val accessTokenExpiresIn: Long,
-    val refreshTokenExpiresIn: Long,
-    val user: AuthUser? = null,
-)
-
-internal data class AuthUser(
-    val id: String,
-    val email: String?,
-    val nickname: String,
-)
-
-internal sealed interface KakaoLoginResult {
-    data class LoggedIn(
-        val tokenData: AuthTokenData,
-    ) : KakaoLoginResult
-
-    data class NicknameRequired(
-        val data: KakaoNicknameRequired,
-    ) : KakaoLoginResult
-
-    data class AccountLinkRequired(
-        val data: KakaoAccountLinkRequired,
-    ) : KakaoLoginResult
-
-    data class Failure(
-        val message: String,
-    ) : KakaoLoginResult
-}
-
-@Serializable
-internal data class KakaoAccountLinkRequired(
-    val email: String,
-    val provider: String,
-    val linkToken: String,
-    val expiresInSeconds: Long,
-)
-
-@Serializable
-internal data class KakaoNicknameRequired(
-    val signupToken: String,
-    val provider: String,
-    val suggestedNickname: String? = null,
-)
 
 @Serializable
 private data class LoginRequest(
@@ -534,33 +489,6 @@ private const val HttpCreated = 201
 private const val HttpAccepted = 202
 private const val HttpUnauthorized = 401
 private const val HttpConflict = 409
-
-@Serializable
-internal data class EmailAvailability(
-    val email: String,
-    val available: Boolean,
-)
-
-@Serializable
-internal data class SignupData(
-    val userId: String,
-    val email: String,
-    val nickname: String,
-    val emailVerificationRequired: Boolean,
-    val emailVerificationSent: Boolean,
-)
-
-@Serializable
-internal data class EmailVerificationSent(
-    val email: String,
-    val expiresInSeconds: Long,
-)
-
-@Serializable
-internal data class PasswordResetRequested(
-    val email: String,
-    val expiresInSeconds: Long,
-)
 
 @Serializable
 private data class AuthTokenDataResponse(

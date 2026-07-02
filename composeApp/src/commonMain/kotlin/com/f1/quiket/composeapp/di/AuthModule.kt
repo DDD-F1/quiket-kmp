@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.auth.AuthClient
+import com.f1.quiket.composeapp.auth.data.remote.AuthClient
 import com.f1.quiket.composeapp.auth.data.remote.AuthRemoteDataSource
 import com.f1.quiket.composeapp.auth.data.remote.AuthRemoteDataSourceImpl
 import com.f1.quiket.composeapp.auth.data.repository.AuthRepositoryImpl

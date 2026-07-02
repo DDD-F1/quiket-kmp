@@ -2,7 +2,7 @@ package com.f1.quiket.composeapp.auth.domain.usecase
 
 import com.f1.quiket.composeapp.FakeAuthRepository
 import com.f1.quiket.composeapp.FakeSessionRepository
-import com.f1.quiket.composeapp.auth.AuthException
+import com.f1.quiket.composeapp.auth.domain.model.AuthException
 import com.f1.quiket.composeapp.testAuthToken
 import com.f1.quiket.composeapp.testSession
 import kotlinx.coroutines.test.runTest

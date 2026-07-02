@@ -1,13 +1,13 @@
 package com.f1.quiket.composeapp.mypage.domain.usecase
 
 import com.f1.quiket.composeapp.auth.domain.usecase.AuthenticatedCallRunner
-import com.f1.quiket.composeapp.mypage.EmailVerificationSent
-import com.f1.quiket.composeapp.mypage.Feedback
-import com.f1.quiket.composeapp.mypage.FeedbackCreate
-import com.f1.quiket.composeapp.mypage.MyPageData
-import com.f1.quiket.composeapp.mypage.MyPageException
-import com.f1.quiket.composeapp.mypage.MyProfile
-import com.f1.quiket.composeapp.mypage.NotificationSettings
+import com.f1.quiket.composeapp.mypage.domain.model.EmailVerificationSent
+import com.f1.quiket.composeapp.mypage.domain.model.Feedback
+import com.f1.quiket.composeapp.mypage.domain.model.FeedbackCreate
+import com.f1.quiket.composeapp.mypage.domain.model.MyPageData
+import com.f1.quiket.composeapp.mypage.domain.model.MyPageException
+import com.f1.quiket.composeapp.mypage.domain.model.MyProfile
+import com.f1.quiket.composeapp.mypage.domain.model.NotificationSettings
 import com.f1.quiket.composeapp.mypage.domain.repository.MyPageRepository
 
 internal class MyPageUseCases(

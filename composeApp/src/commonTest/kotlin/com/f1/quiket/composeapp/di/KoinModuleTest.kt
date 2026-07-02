@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.auth.AuthClient
+import com.f1.quiket.composeapp.auth.data.remote.AuthClient
 import com.f1.quiket.composeapp.auth.data.remote.AuthRemoteDataSource
 import com.f1.quiket.composeapp.auth.domain.repository.AuthRepository
 import com.f1.quiket.composeapp.auth.domain.repository.SessionRepository
@@ -23,7 +23,7 @@ import com.f1.quiket.composeapp.home.domain.repository.HomeRepository
 import com.f1.quiket.composeapp.home.domain.usecase.HomeUseCases
 import com.f1.quiket.composeapp.home.presentation.ExamScheduleStateHolder
 import com.f1.quiket.composeapp.main.presentation.MainStateHolder
-import com.f1.quiket.composeapp.mypage.MyPageClient
+import com.f1.quiket.composeapp.mypage.data.remote.MyPageClient
 import com.f1.quiket.composeapp.mypage.data.remote.MyPageRemoteDataSource
 import com.f1.quiket.composeapp.mypage.domain.repository.MyPageRepository
 import com.f1.quiket.composeapp.mypage.domain.usecase.MyPageUseCases

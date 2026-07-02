@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.mypage.MyPageClient
+import com.f1.quiket.composeapp.mypage.data.remote.MyPageClient
 import com.f1.quiket.composeapp.mypage.data.remote.MyPageRemoteDataSource
 import com.f1.quiket.composeapp.mypage.data.remote.MyPageRemoteDataSourceImpl
 import com.f1.quiket.composeapp.mypage.data.repository.MyPageRepositoryImpl

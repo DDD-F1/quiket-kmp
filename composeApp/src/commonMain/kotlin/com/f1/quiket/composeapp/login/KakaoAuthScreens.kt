@@ -6,9 +6,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import com.f1.quiket.composeapp.auth.AuthTokenData
-import com.f1.quiket.composeapp.auth.KakaoAccountLinkRequired
-import com.f1.quiket.composeapp.auth.KakaoNicknameRequired
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
+import com.f1.quiket.composeapp.auth.domain.model.KakaoAccountLinkRequired
+import com.f1.quiket.composeapp.auth.domain.model.KakaoNicknameRequired
 import com.f1.quiket.composeapp.auth.presentation.AuthStateHolder
 import com.f1.quiket.composeapp.network.toUserFacingMessage
 import kotlinx.coroutines.launch

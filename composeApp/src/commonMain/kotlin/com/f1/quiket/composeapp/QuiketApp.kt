@@ -33,9 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.f1.quiket.composeapp.auth.AuthTokenData
-import com.f1.quiket.composeapp.auth.AuthException
-import com.f1.quiket.composeapp.auth.KakaoLoginResult
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
+import com.f1.quiket.composeapp.auth.domain.model.AuthException
+import com.f1.quiket.composeapp.auth.domain.model.KakaoLoginResult
 import com.f1.quiket.composeapp.auth.presentation.AuthStateHolder
 import com.f1.quiket.composeapp.designsystem.QuiketBrown50
 import com.f1.quiket.composeapp.designsystem.QuiketGray700

@@ -72,6 +72,9 @@ import com.f1.quiket.composeapp.designsystem.QuiketOrange500
 import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
+import com.f1.quiket.composeapp.mypage.domain.model.FeedbackCategory
+import com.f1.quiket.composeapp.mypage.domain.model.MyProfile
+import com.f1.quiket.composeapp.mypage.domain.model.NotificationSettings
 import com.f1.quiket.composeapp.mypage.presentation.AccountSettingsStateHolder
 import com.f1.quiket.composeapp.mypage.presentation.InquiryStateHolder
 import com.f1.quiket.composeapp.mypage.presentation.NotificationSettingsStateHolder

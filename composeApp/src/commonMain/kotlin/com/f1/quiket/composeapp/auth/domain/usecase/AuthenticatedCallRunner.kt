@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.auth.domain.usecase
 
-import com.f1.quiket.composeapp.auth.AuthException
+import com.f1.quiket.composeapp.auth.domain.model.AuthException
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.auth.domain.repository.AuthRepository
 import com.f1.quiket.composeapp.auth.domain.repository.SessionRepository

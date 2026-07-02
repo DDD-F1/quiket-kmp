@@ -11,9 +11,9 @@ import com.f1.quiket.composeapp.history.domain.usecase.HistoryUseCases
 import com.f1.quiket.composeapp.home.domain.model.HomeData
 import com.f1.quiket.composeapp.home.domain.model.HomeException
 import com.f1.quiket.composeapp.home.domain.usecase.HomeUseCases
-import com.f1.quiket.composeapp.mypage.MyPageData
-import com.f1.quiket.composeapp.mypage.MyPageException
-import com.f1.quiket.composeapp.mypage.MyProfile
+import com.f1.quiket.composeapp.mypage.domain.model.MyPageData
+import com.f1.quiket.composeapp.mypage.domain.model.MyPageException
+import com.f1.quiket.composeapp.mypage.domain.model.MyProfile
 import com.f1.quiket.composeapp.mypage.domain.usecase.MyPageUseCases
 import com.f1.quiket.composeapp.network.toUserFacingMessage
 

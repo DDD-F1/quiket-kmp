@@ -1,6 +1,7 @@
 package com.f1.quiket.composeapp.auth
 
 import cnames.structs.__CFData
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import kotlinx.cinterop.COpaquePointerVar
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf

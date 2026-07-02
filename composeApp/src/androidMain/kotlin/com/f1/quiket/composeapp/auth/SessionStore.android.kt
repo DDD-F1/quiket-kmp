@@ -1,5 +1,7 @@
 package com.f1.quiket.composeapp.auth
 
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
+
 internal actual object SessionStore {
     actual suspend fun read(): SessionSnapshot {
         val preferences = AndroidSessionContext.preferences()

@@ -95,7 +95,7 @@ import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 import com.f1.quiket.composeapp.home.presentation.HomeExamUiModel
 import com.f1.quiket.composeapp.home.presentation.dDayLabel
 import com.f1.quiket.composeapp.home.presentation.toHomeExams
-import com.f1.quiket.composeapp.mypage.MyProfile
+import com.f1.quiket.composeapp.mypage.domain.model.MyProfile
 import com.f1.quiket.composeapp.mypage.LegalTextScreen
 import com.f1.quiket.composeapp.mypage.AccountSettingsRoute
 import com.f1.quiket.composeapp.mypage.InquiryRoute

@@ -1,12 +1,12 @@
 package com.f1.quiket.composeapp.mypage.domain.repository
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.mypage.EmailVerificationSent
-import com.f1.quiket.composeapp.mypage.Feedback
-import com.f1.quiket.composeapp.mypage.FeedbackCreate
-import com.f1.quiket.composeapp.mypage.MyPageData
-import com.f1.quiket.composeapp.mypage.MyProfile
-import com.f1.quiket.composeapp.mypage.NotificationSettings
+import com.f1.quiket.composeapp.mypage.domain.model.EmailVerificationSent
+import com.f1.quiket.composeapp.mypage.domain.model.Feedback
+import com.f1.quiket.composeapp.mypage.domain.model.FeedbackCreate
+import com.f1.quiket.composeapp.mypage.domain.model.MyPageData
+import com.f1.quiket.composeapp.mypage.domain.model.MyProfile
+import com.f1.quiket.composeapp.mypage.domain.model.NotificationSettings
 
 internal interface MyPageRepository {
     suspend fun getMyPage(session: SessionSnapshot): MyPageData

@@ -1,5 +1,7 @@
 package com.f1.quiket.composeapp.auth
 
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
+
 internal data class SessionSnapshot(
     val onboardingCompleted: Boolean,
     val homeGuideCompleted: Boolean,

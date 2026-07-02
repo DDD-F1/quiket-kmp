@@ -31,7 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.f1.quiket.composeapp.auth.AuthTokenData
+import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.presentation.AuthStateHolder
 import com.f1.quiket.composeapp.designsystem.QuiketBrown950
 import com.f1.quiket.composeapp.designsystem.QuiketGray100
