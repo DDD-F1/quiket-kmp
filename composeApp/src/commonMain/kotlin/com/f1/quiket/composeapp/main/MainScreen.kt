@@ -126,7 +126,10 @@ import com.f1.quiket.composeapp.mypage.PrivacyPolicyRawText
 import com.f1.quiket.composeapp.mypage.ServiceTermsRawText
 import com.f1.quiket.composeapp.main.presentation.HistoryUiState
 import com.f1.quiket.composeapp.main.presentation.HomeUiState
+import com.f1.quiket.composeapp.main.presentation.MainBottomBar
 import com.f1.quiket.composeapp.main.presentation.MainStateHolder
+import com.f1.quiket.composeapp.main.presentation.MainTab
+import com.f1.quiket.composeapp.main.presentation.MyPageDestination
 import com.f1.quiket.composeapp.main.presentation.MyPageUiState
 import com.f1.quiket.composeapp.quiz.QuizCreateRoute
 import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
@@ -145,14 +148,6 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import quiket.composeapp.generated.resources.Res
 import quiket.composeapp.generated.resources.ic_acorn
-import quiket.composeapp.generated.resources.ic_bottom_home_gray
-import quiket.composeapp.generated.resources.ic_bottom_home_primary
-import quiket.composeapp.generated.resources.ic_bottom_my_gray
-import quiket.composeapp.generated.resources.ic_bottom_my_primary
-import quiket.composeapp.generated.resources.ic_bottom_record_gray
-import quiket.composeapp.generated.resources.ic_bottom_record_primary
-import quiket.composeapp.generated.resources.ic_bottom_review_gray
-import quiket.composeapp.generated.resources.ic_bottom_review_primary
 import quiket.composeapp.generated.resources.ic_floating_close
 import quiket.composeapp.generated.resources.ic_floating_plus
 import quiket.composeapp.generated.resources.ic_home_guide_tooltip
@@ -403,7 +398,7 @@ internal fun MainScreen(
         modifier = modifier.fillMaxSize(),
         containerColor = containerColor,
         bottomBar = {
-            BottomBar(
+            MainBottomBar(
                 selectedTab = selectedTab,
                 onTabClick = ::switchMainTab,
             )
@@ -607,48 +602,6 @@ internal fun MainScreen(
                     state = myPageState,
                     onRetry = ::loadMyPage,
                     onSettingsClick = { myPageDestination = MyPageDestination.Settings },
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BottomBar(
-    selectedTab: MainTab,
-    onTabClick: (MainTab) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(QuiketWhite)
-            .padding(top = 6.dp),
-        verticalAlignment = Alignment.Top,
-    ) {
-        MainTab.entries.forEach { tab ->
-            val selected = selectedTab == tab
-            Column(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable(role = Role.Tab) { onTabClick(tab) },
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Top,
-            ) {
-                Icon(
-                    painter = painterResource(if (selected) tab.selectedIcon else tab.unselectedIcon),
-                    contentDescription = tab.label,
-                    tint = Color.Unspecified,
-                    modifier = Modifier.size(24.dp),
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = tab.label,
-                    style = MaterialTheme.typography.labelSmall,
-                    color = if (selected) QuiketBrown950 else QuiketGray400,
                 )
             }
         }
@@ -3402,15 +3355,6 @@ private fun MyPageInfoCard(
     }
 }
 
-private enum class MyPageDestination {
-    Settings,
-    AccountSettings,
-    NotificationSettings,
-    Inquiry,
-    Terms,
-    PrivacyPolicy,
-}
-
 private enum class HomeContentTab {
     Subjects,
     Recent,
@@ -3593,30 +3537,3 @@ private fun CreatedSubject.toHomeSubjectSummary(): SubjectSummary =
         lastActivityAt = null,
         examSchedule = null,
     )
-
-private enum class MainTab(
-    val label: String,
-    val selectedIcon: DrawableResource,
-    val unselectedIcon: DrawableResource,
-) {
-    Home(
-        label = "홈",
-        selectedIcon = Res.drawable.ic_bottom_home_primary,
-        unselectedIcon = Res.drawable.ic_bottom_home_gray,
-    ),
-    History(
-        label = "기록",
-        selectedIcon = Res.drawable.ic_bottom_record_primary,
-        unselectedIcon = Res.drawable.ic_bottom_record_gray,
-    ),
-    Review(
-        label = "오답노트",
-        selectedIcon = Res.drawable.ic_bottom_review_primary,
-        unselectedIcon = Res.drawable.ic_bottom_review_gray,
-    ),
-    MyPage(
-        label = "마이",
-        selectedIcon = Res.drawable.ic_bottom_my_primary,
-        unselectedIcon = Res.drawable.ic_bottom_my_gray,
-    ),
-}
