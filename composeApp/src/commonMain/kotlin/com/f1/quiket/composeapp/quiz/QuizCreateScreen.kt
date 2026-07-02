@@ -87,8 +87,10 @@ import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.quiz.domain.model.QuizDifficulty
 import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
 import com.f1.quiket.composeapp.quiz.domain.model.QuizScope
-import com.f1.quiket.composeapp.quiz.domain.model.ServerQuizType
+import com.f1.quiket.composeapp.quiz.presentation.QuizCreateStep
 import com.f1.quiket.composeapp.quiz.presentation.QuizCreateStateHolder
+import com.f1.quiket.composeapp.quiz.presentation.QuizTypeOption
+import com.f1.quiket.composeapp.quiz.presentation.icon
 import com.f1.quiket.composeapp.subject.domain.model.PartSummary
 import com.f1.quiket.composeapp.subject.domain.model.SubjectListItem
 import com.f1.quiket.composeapp.util.hidePlatformKeyboard
@@ -102,10 +104,6 @@ import org.jetbrains.compose.resources.painterResource
 import quiket.composeapp.generated.resources.Res
 import quiket.composeapp.generated.resources.ic_acorn
 import quiket.composeapp.generated.resources.ic_qring_profile
-import quiket.composeapp.generated.resources.ic_quiz_flashcard
-import quiket.composeapp.generated.resources.ic_quiz_multiple
-import quiket.composeapp.generated.resources.ic_quiz_ox
-import quiket.composeapp.generated.resources.ic_quiz_short
 import quiket.composeapp.generated.resources.ic_detail_edit
 
 private const val QuizLoadingFullLottieResource = "files/quiz_loading_full.json"
@@ -116,32 +114,6 @@ private val QuizGreen800 = Color(0xFF465420)
 private val QuizBlue100 = Color(0xFFE2F2FC)
 private val QuizBlue300 = Color(0xFF84CFF5)
 private val QuizBlue800 = Color(0xFF0E567E)
-
-internal enum class QuizCreateStep {
-    Subject,
-    Scope,
-    Options,
-    Loading,
-}
-
-internal enum class QuizTypeOption(
-    val title: String,
-    val serverType: ServerQuizType?,
-    val requiresChoiceCount: Boolean,
-) {
-    MultipleChoice("객관식", ServerQuizType.MultipleChoice, true),
-    Ox("O/X 퀴즈", ServerQuizType.Ox, false),
-    Flashcard("플래시카드", null, false),
-    ShortAnswer("쪽지시험", null, false),
-}
-
-private val QuizTypeOption.icon: DrawableResource
-    get() = when (this) {
-        QuizTypeOption.MultipleChoice -> Res.drawable.ic_quiz_multiple
-        QuizTypeOption.Ox -> Res.drawable.ic_quiz_ox
-        QuizTypeOption.Flashcard -> Res.drawable.ic_quiz_flashcard
-        QuizTypeOption.ShortAnswer -> Res.drawable.ic_quiz_short
-    }
 
 @Composable
 internal fun QuizCreateRoute(
