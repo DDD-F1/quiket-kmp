@@ -6,6 +6,14 @@ internal class SubjectException(
     val statusCode: Int? = null,
 ) : Exception(message)
 
+internal class PickedUploadFile(
+    val name: String,
+    val mimeType: String,
+    val bytes: ByteArray,
+) {
+    val sizeBytes: Long = bytes.size.toLong()
+}
+
 internal data class SubjectDetail(
     val id: String,
     val name: String,

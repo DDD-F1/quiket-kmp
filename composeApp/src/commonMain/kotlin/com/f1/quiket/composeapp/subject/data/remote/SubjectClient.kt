@@ -3,7 +3,7 @@ package com.f1.quiket.composeapp.subject.data.remote
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.network.ApiEnvelope
 import com.f1.quiket.composeapp.network.ensureTrailingSlash
-import com.f1.quiket.composeapp.subject.PickedUploadFile
+import com.f1.quiket.composeapp.subject.domain.model.PickedUploadFile
 import com.f1.quiket.composeapp.subject.domain.model.Certificate
 import com.f1.quiket.composeapp.subject.domain.model.Chapter
 import com.f1.quiket.composeapp.subject.domain.model.ChapterWithParts

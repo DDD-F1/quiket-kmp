@@ -10,7 +10,7 @@ import com.f1.quiket.composeapp.subject.domain.model.LectureUploadProgress
 import com.f1.quiket.composeapp.subject.domain.model.PartDetail
 import com.f1.quiket.composeapp.subject.domain.model.PartSplitMethod
 import com.f1.quiket.composeapp.subject.domain.model.PartSplitPlan
-import com.f1.quiket.composeapp.subject.PickedUploadFile
+import com.f1.quiket.composeapp.subject.domain.model.PickedUploadFile
 import com.f1.quiket.composeapp.subject.domain.model.SubjectCreateInput
 import com.f1.quiket.composeapp.subject.domain.model.SubjectDetail
 import com.f1.quiket.composeapp.subject.domain.model.SubjectExamSchedule

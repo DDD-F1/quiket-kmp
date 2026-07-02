@@ -2,6 +2,7 @@ package com.f1.quiket.composeapp.subject
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.f1.quiket.composeapp.subject.domain.model.PickedUploadFile
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.convert

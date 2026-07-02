@@ -12,6 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import com.f1.quiket.composeapp.subject.domain.model.PickedUploadFile
 
 @Composable
 internal actual fun rememberUploadFilePicker(
@@ -73,4 +74,3 @@ private fun Context.readPickedUploadFile(uri: Uri): PickedUploadFile? =
             bytes = bytes,
         )
     }.getOrNull()
-

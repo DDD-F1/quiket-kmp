@@ -14,7 +14,7 @@ import com.f1.quiket.composeapp.subject.MaxTextUploadLength
 import com.f1.quiket.composeapp.subject.PartClassifyMethod
 import com.f1.quiket.composeapp.subject.domain.model.PartSplitMethod
 import com.f1.quiket.composeapp.subject.domain.model.PartSplitPlan
-import com.f1.quiket.composeapp.subject.PickedUploadFile
+import com.f1.quiket.composeapp.subject.domain.model.PickedUploadFile
 import com.f1.quiket.composeapp.subject.domain.model.SubjectDetail
 import com.f1.quiket.composeapp.subject.domain.model.SubjectException
 import com.f1.quiket.composeapp.subject.UploadTab

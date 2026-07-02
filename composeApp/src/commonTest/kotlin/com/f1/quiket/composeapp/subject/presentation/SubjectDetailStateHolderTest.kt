@@ -16,7 +16,7 @@ import com.f1.quiket.composeapp.subject.domain.model.PartDetail
 import com.f1.quiket.composeapp.subject.domain.model.PartSplitMethod
 import com.f1.quiket.composeapp.subject.domain.model.PartSplitPlan
 import com.f1.quiket.composeapp.subject.domain.model.PartSummary
-import com.f1.quiket.composeapp.subject.PickedUploadFile
+import com.f1.quiket.composeapp.subject.domain.model.PickedUploadFile
 import com.f1.quiket.composeapp.subject.PartDetailUiState
 import com.f1.quiket.composeapp.subject.domain.model.SubjectCreateInput
 import com.f1.quiket.composeapp.subject.domain.model.SubjectDetail
