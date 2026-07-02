@@ -63,6 +63,7 @@ composeApp/src/commonMain/kotlin/com/f1/quiket/composeapp/<feature>/
 
 ## Gradle Wiring
 
-- Use existing convention plugins instead of repeating Android/KMP/Compose setup manually.
+- Keep Gradle wiring focused on the KMP app: root project plus `:composeApp`.
+- Use version-catalog plugin aliases and source-set dependencies before adding custom build logic.
 - Add only the dependencies required by the target module/source set.
 - Verify the changed surface with the tasks listed in `docs/codex-preflight.md`.

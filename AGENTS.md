@@ -13,10 +13,11 @@ Use these instructions for AI coding work in this repository.
 
 ## Repository Shape
 
-- Existing Android app: `app`, `core`, `feature` Gradle multi-module.
-- Current KMP/Compose Multiplatform app: `composeApp` shared KMP module plus `iosApp` host.
-- Android `dev` is the visual and behavioral parity reference for `current KMP branch`.
-- Do not assume Compose Multiplatform currently has feature-by-feature Gradle modules; it is split by packages under `composeApp/src/commonMain`.
+- This repository is the KMP/Compose Multiplatform app.
+- Product code lives in `composeApp` as the shared KMP module.
+- `iosApp` is the Swift/iOS host shell.
+- The legacy Android app lives in the separate Android repository and is only a QA parity reference when needed.
+- Do not assume feature-by-feature Gradle modules; this app is split by packages under `composeApp/src/commonMain`.
 
 ## Project Guardrails
 

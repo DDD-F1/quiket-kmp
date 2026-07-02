@@ -131,6 +131,12 @@ Use it to compare:
 
 If Compose Multiplatform intentionally differs because of platform constraints, document the accepted result in `docs/kmp-current-status.md` or `docs/kmp-migration-parity.md`.
 
-## Build Logic
+## Gradle Shape
 
-`build-logic` included build provides Android/KMP convention plugins. New Gradle settings should reuse existing convention plugins before adding manual setup.
+The repository is intentionally small at the Gradle level:
+
+- root project
+- `:composeApp` shared KMP app module
+- `iosApp` Xcode host project
+
+Do not add custom build logic or feature Gradle modules without an explicit architecture decision.
