@@ -7,12 +7,8 @@ import com.f1.quiket.composeapp.network.toUserFacingMessage
 import com.f1.quiket.composeapp.subject.domain.model.ChapterWithParts
 import com.f1.quiket.composeapp.subject.domain.model.PartDetail
 import com.f1.quiket.composeapp.subject.domain.model.SubjectDetail
-import com.f1.quiket.composeapp.subject.SubjectDetailUiState
 import com.f1.quiket.composeapp.subject.domain.model.SubjectException
 import com.f1.quiket.composeapp.subject.domain.usecase.SubjectUseCases
-import com.f1.quiket.composeapp.subject.withRenamedChapter
-import com.f1.quiket.composeapp.subject.withUpdatedPart
-import com.f1.quiket.composeapp.subject.withoutChapter
 
 internal class SubjectDetailStateHolder(
     private val subjectUseCases: SubjectUseCases,

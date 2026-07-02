@@ -85,7 +85,9 @@ import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.subject.presentation.PartDetailStateHolder
+import com.f1.quiket.composeapp.subject.presentation.PartDetailUiState
 import com.f1.quiket.composeapp.subject.presentation.SubjectDetailStateHolder
+import com.f1.quiket.composeapp.subject.presentation.SubjectDetailUiState
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -2348,57 +2350,6 @@ private data class PartEntry(
     val part: PartSummary,
 )
 
-internal sealed interface PartDetailUiState {
-    data object Loading : PartDetailUiState
-    data class Success(val part: PartDetail) : PartDetailUiState
-    data class Error(val message: String) : PartDetailUiState
-}
-
-internal sealed interface SubjectDetailUiState {
-    data class Loading(val subjectName: String) : SubjectDetailUiState
-    data class Success(val subject: SubjectDetail) : SubjectDetailUiState
-    data class Error(val subjectName: String, val message: String) : SubjectDetailUiState
-}
-
-internal fun SubjectDetail.withUpdatedPart(updatedPart: PartDetail): SubjectDetail = copy(
-    chapters = chapters.map { chapter ->
-        if (chapter.id != updatedPart.chapterId) {
-            chapter
-        } else {
-            chapter.copy(
-                parts = chapter.parts.map { part ->
-                    if (part.id == updatedPart.id) {
-                        part.copy(
-                            name = updatedPart.name,
-                            contentPreview = updatedPart.contentPreview
-                                ?: updatedPart.content?.take(PartContentPreviewMaxLength),
-                        )
-                    } else {
-                        part
-                    }
-                },
-            )
-        }
-    },
-)
-
-internal fun SubjectDetail.withRenamedChapter(
-    chapterId: String,
-    name: String,
-): SubjectDetail = copy(
-    chapters = chapters.map { chapter ->
-        if (chapter.id == chapterId) {
-            chapter.copy(name = name)
-        } else {
-            chapter
-        }
-    },
-)
-
-internal fun SubjectDetail.withoutChapter(chapterId: String): SubjectDetail = copy(
-    chapters = chapters.filterNot { chapter -> chapter.id == chapterId },
-)
-
 private val SubjectGreen = Color(0xFF465420)
 private val SubjectGray500 = Color(0xFF96989B)
 private val SubjectGray800 = Color(0xFF656668)
@@ -2406,7 +2357,6 @@ private val SubjectGray900 = Color(0xFF535355)
 private val SubjectBrown100 = Color(0xFFE8E2D9)
 private val SubjectBrown300 = Color(0xFFBAA38A)
 private val SubjectBrown700 = Color(0xFF684C40)
-private const val PartContentPreviewMaxLength = 80
 private const val PartNameMaxLength = 30
 
 private data class SubjectLabels(

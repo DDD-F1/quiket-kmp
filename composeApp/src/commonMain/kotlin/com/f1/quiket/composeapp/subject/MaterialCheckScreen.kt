@@ -65,6 +65,7 @@ import com.f1.quiket.composeapp.designsystem.QuiketOrange500
 import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.subject.presentation.MaterialCheckStateHolder
+import com.f1.quiket.composeapp.subject.presentation.MaterialCheckUiState
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import quiket.composeapp.generated.resources.Res
@@ -668,12 +669,6 @@ private fun MaterialNameEditDialog(
             }
         }
     }
-}
-
-internal sealed interface MaterialCheckUiState {
-    data object Loading : MaterialCheckUiState
-    data class Success(val progress: LectureUploadProgress) : MaterialCheckUiState
-    data class Error(val message: String) : MaterialCheckUiState
 }
 
 private const val MaterialNameMaxLength = 30
