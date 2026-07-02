@@ -7,7 +7,6 @@ import com.f1.quiket.composeapp.login.EmailFormatErrorMessage
 import com.f1.quiket.composeapp.login.isValidEmail
 import com.f1.quiket.composeapp.mypage.domain.model.FeedbackCategory
 import com.f1.quiket.composeapp.mypage.domain.model.FeedbackCreate
-import com.f1.quiket.composeapp.mypage.InquiryUiState
 import com.f1.quiket.composeapp.mypage.domain.model.MyPageException
 import com.f1.quiket.composeapp.mypage.domain.usecase.MyPageUseCases
 import com.f1.quiket.composeapp.network.toUserFacingMessage

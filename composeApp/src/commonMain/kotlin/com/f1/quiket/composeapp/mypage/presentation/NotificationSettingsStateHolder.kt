@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.f1.quiket.composeapp.mypage.domain.model.MyPageException
 import com.f1.quiket.composeapp.mypage.domain.model.NotificationSettings
-import com.f1.quiket.composeapp.mypage.NotificationSettingsUiState
 import com.f1.quiket.composeapp.mypage.domain.usecase.MyPageUseCases
 import com.f1.quiket.composeapp.network.toUserFacingMessage
 

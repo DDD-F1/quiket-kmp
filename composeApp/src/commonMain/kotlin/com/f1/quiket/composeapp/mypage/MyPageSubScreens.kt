@@ -75,9 +75,13 @@ import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.mypage.domain.model.FeedbackCategory
 import com.f1.quiket.composeapp.mypage.domain.model.MyProfile
 import com.f1.quiket.composeapp.mypage.domain.model.NotificationSettings
+import com.f1.quiket.composeapp.mypage.presentation.AccountDialog
 import com.f1.quiket.composeapp.mypage.presentation.AccountSettingsStateHolder
+import com.f1.quiket.composeapp.mypage.presentation.AccountSettingsUiState
 import com.f1.quiket.composeapp.mypage.presentation.InquiryStateHolder
+import com.f1.quiket.composeapp.mypage.presentation.InquiryUiState
 import com.f1.quiket.composeapp.mypage.presentation.NotificationSettingsStateHolder
+import com.f1.quiket.composeapp.mypage.presentation.NotificationSettingsUiState
 import com.f1.quiket.composeapp.util.hidePlatformKeyboard
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
@@ -1156,36 +1160,3 @@ private fun DeleteAccountDialog(
         }
     }
 }
-
-internal data class AccountSettingsUiState(
-    val isLoading: Boolean = true,
-    val isSaving: Boolean = false,
-    val profile: MyProfile? = null,
-    val message: String? = null,
-) {
-    val isLocalAccount: Boolean
-        get() = profile?.providers.orEmpty().any { it.equals("local", ignoreCase = true) }
-}
-
-internal sealed interface AccountDialog {
-    data class Nickname(val initialNickname: String) : AccountDialog
-    data object EmailRequest : AccountDialog
-    data class EmailConfirm(val email: String) : AccountDialog
-    data object Password : AccountDialog
-    data object DeleteAccount : AccountDialog
-}
-
-internal data class NotificationSettingsUiState(
-    val isLoading: Boolean = true,
-    val isSaving: Boolean = false,
-    val settings: NotificationSettings? = null,
-    val message: String? = null,
-)
-
-internal data class InquiryUiState(
-    val isSubmitting: Boolean = false,
-    val category: FeedbackCategory = FeedbackCategory.Inquiry,
-    val body: String = "",
-    val replyEmail: String = "",
-    val message: String? = null,
-)
