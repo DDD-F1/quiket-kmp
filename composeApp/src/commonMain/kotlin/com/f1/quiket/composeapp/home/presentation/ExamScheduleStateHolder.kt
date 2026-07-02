@@ -6,8 +6,8 @@ import androidx.compose.runtime.setValue
 import com.f1.quiket.composeapp.home.ExamEditorMode
 import com.f1.quiket.composeapp.home.ExamScheduleItem
 import com.f1.quiket.composeapp.home.ExamScheduleUiState
-import com.f1.quiket.composeapp.home.HomeException
-import com.f1.quiket.composeapp.home.SubjectSummary
+import com.f1.quiket.composeapp.home.domain.model.HomeException
+import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 import com.f1.quiket.composeapp.home.domain.usecase.HomeUseCases
 import com.f1.quiket.composeapp.home.toExamScheduleItems
 import com.f1.quiket.composeapp.network.toUserFacingMessage

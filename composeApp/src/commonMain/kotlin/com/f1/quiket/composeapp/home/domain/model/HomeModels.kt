@@ -1,0 +1,60 @@
+package com.f1.quiket.composeapp.home.domain.model
+
+internal class HomeException(
+    message: String,
+    val isUnauthorized: Boolean = false,
+) : Exception(message)
+
+internal data class HomeData(
+    val user: HomeUserSummary,
+    val hero: HomeHero?,
+    val dDayCards: List<SubjectExamSchedule>,
+    val subjects: List<SubjectSummary>,
+    val recentActivities: List<RecentActivity>,
+)
+
+internal data class HomeHero(
+    val hasActiveQuiz: Boolean,
+    val activeQuiz: RecentActivity?,
+)
+
+internal data class HomeUserSummary(
+    val nickname: String,
+    val dotoriBalance: Int,
+    val xpTotal: Int,
+    val currentLevel: Int,
+    val levelName: String?,
+)
+
+internal data class SubjectSummary(
+    val id: String,
+    val name: String,
+    val purpose: String,
+    val chapterCount: Int,
+    val partCount: Int,
+    val lastActivityAt: String?,
+    val examSchedule: SubjectExamSchedule?,
+)
+
+internal data class SubjectExamSchedule(
+    val id: String,
+    val subjectId: String,
+    val examName: String,
+    val examDate: String,
+    val dDay: Int?,
+)
+
+internal data class RecentActivity(
+    val activityId: String,
+    val activityType: String,
+    val quizSessionId: String?,
+    val playSessionId: String?,
+    val resultId: String?,
+    val title: String,
+    val subjectId: String,
+    val subjectName: String,
+    val status: String?,
+    val progressPct: Int?,
+    val scoreText: String?,
+    val createdAt: String,
+)

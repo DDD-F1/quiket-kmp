@@ -1,7 +1,7 @@
 package com.f1.quiket.composeapp.home.presentation
 
-import com.f1.quiket.composeapp.home.HomeData
-import com.f1.quiket.composeapp.home.SubjectExamSchedule
+import com.f1.quiket.composeapp.home.domain.model.HomeData
+import com.f1.quiket.composeapp.home.domain.model.SubjectExamSchedule
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.Month
 import kotlinx.datetime.TimeZone

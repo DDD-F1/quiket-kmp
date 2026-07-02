@@ -67,6 +67,7 @@ import com.f1.quiket.composeapp.designsystem.QuiketOrange500
 import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
+import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 import com.f1.quiket.composeapp.home.presentation.ExamScheduleStateHolder
 import com.f1.quiket.composeapp.util.hidePlatformKeyboard
 import kotlinx.coroutines.delay

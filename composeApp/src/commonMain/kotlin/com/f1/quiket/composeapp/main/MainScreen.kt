@@ -90,8 +90,8 @@ import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.history.domain.model.HistoryActivityType
 import com.f1.quiket.composeapp.home.ExamScheduleRoute
-import com.f1.quiket.composeapp.home.RecentActivity
-import com.f1.quiket.composeapp.home.SubjectSummary
+import com.f1.quiket.composeapp.home.domain.model.RecentActivity
+import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 import com.f1.quiket.composeapp.home.presentation.HomeExamUiModel
 import com.f1.quiket.composeapp.home.presentation.dDayLabel
 import com.f1.quiket.composeapp.home.presentation.toHomeExams

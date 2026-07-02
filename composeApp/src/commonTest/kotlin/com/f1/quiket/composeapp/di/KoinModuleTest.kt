@@ -17,7 +17,7 @@ import com.f1.quiket.composeapp.history.data.remote.HistoryClient
 import com.f1.quiket.composeapp.history.data.remote.HistoryRemoteDataSource
 import com.f1.quiket.composeapp.history.domain.repository.HistoryRepository
 import com.f1.quiket.composeapp.history.domain.usecase.HistoryUseCases
-import com.f1.quiket.composeapp.home.HomeClient
+import com.f1.quiket.composeapp.home.data.remote.HomeClient
 import com.f1.quiket.composeapp.home.data.remote.HomeRemoteDataSource
 import com.f1.quiket.composeapp.home.domain.repository.HomeRepository
 import com.f1.quiket.composeapp.home.domain.usecase.HomeUseCases

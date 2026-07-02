@@ -1,9 +1,9 @@
 package com.f1.quiket.composeapp.home.domain.usecase
 
 import com.f1.quiket.composeapp.auth.domain.usecase.AuthenticatedCallRunner
-import com.f1.quiket.composeapp.home.HomeData
-import com.f1.quiket.composeapp.home.HomeException
-import com.f1.quiket.composeapp.home.SubjectSummary
+import com.f1.quiket.composeapp.home.domain.model.HomeData
+import com.f1.quiket.composeapp.home.domain.model.HomeException
+import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 import com.f1.quiket.composeapp.home.domain.repository.HomeRepository
 
 internal class HomeUseCases(

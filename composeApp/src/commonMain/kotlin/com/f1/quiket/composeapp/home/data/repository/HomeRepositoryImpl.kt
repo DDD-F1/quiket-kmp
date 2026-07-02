@@ -1,8 +1,8 @@
 package com.f1.quiket.composeapp.home.data.repository
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.home.HomeData
-import com.f1.quiket.composeapp.home.SubjectSummary
+import com.f1.quiket.composeapp.home.domain.model.HomeData
+import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 import com.f1.quiket.composeapp.home.data.remote.HomeRemoteDataSource
 import com.f1.quiket.composeapp.home.domain.repository.HomeRepository
 

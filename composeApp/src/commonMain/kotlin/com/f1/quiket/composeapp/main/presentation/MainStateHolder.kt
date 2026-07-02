@@ -8,8 +8,8 @@ import com.f1.quiket.composeapp.auth.domain.usecase.SaveHomeGuideCompletedUseCas
 import com.f1.quiket.composeapp.history.domain.model.HistoryActivity
 import com.f1.quiket.composeapp.history.domain.model.HistoryException
 import com.f1.quiket.composeapp.history.domain.usecase.HistoryUseCases
-import com.f1.quiket.composeapp.home.HomeData
-import com.f1.quiket.composeapp.home.HomeException
+import com.f1.quiket.composeapp.home.domain.model.HomeData
+import com.f1.quiket.composeapp.home.domain.model.HomeException
 import com.f1.quiket.composeapp.home.domain.usecase.HomeUseCases
 import com.f1.quiket.composeapp.mypage.MyPageData
 import com.f1.quiket.composeapp.mypage.MyPageException

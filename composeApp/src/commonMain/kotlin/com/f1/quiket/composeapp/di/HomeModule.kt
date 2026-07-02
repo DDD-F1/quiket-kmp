@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.home.HomeClient
+import com.f1.quiket.composeapp.home.data.remote.HomeClient
 import com.f1.quiket.composeapp.home.data.remote.HomeRemoteDataSource
 import com.f1.quiket.composeapp.home.data.remote.HomeRemoteDataSourceImpl
 import com.f1.quiket.composeapp.home.data.repository.HomeRepositoryImpl

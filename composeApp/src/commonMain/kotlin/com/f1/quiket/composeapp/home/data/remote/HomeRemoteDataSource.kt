@@ -1,9 +1,9 @@
 package com.f1.quiket.composeapp.home.data.remote
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.home.HomeClient
-import com.f1.quiket.composeapp.home.HomeData
-import com.f1.quiket.composeapp.home.SubjectSummary
+import com.f1.quiket.composeapp.home.data.remote.HomeClient
+import com.f1.quiket.composeapp.home.domain.model.HomeData
+import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 
 internal interface HomeRemoteDataSource {
     suspend fun getHome(session: SessionSnapshot): HomeData

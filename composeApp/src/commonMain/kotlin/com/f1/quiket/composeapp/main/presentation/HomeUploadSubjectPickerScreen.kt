@@ -41,7 +41,7 @@ import com.f1.quiket.composeapp.designsystem.QuiketGray950
 import com.f1.quiket.composeapp.designsystem.QuiketOrange500
 import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
-import com.f1.quiket.composeapp.home.SubjectSummary
+import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
 
 private val MainBottomContentPadding = 112.dp
 
