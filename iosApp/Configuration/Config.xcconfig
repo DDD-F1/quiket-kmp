@@ -1,0 +1,6 @@
+TEAM_ID=
+BUNDLE_ID=com.f1.quiket
+APP_NAME=Quiket
+KAKAO_NATIVE_APP_KEY=
+
+#include? "Local.xcconfig"

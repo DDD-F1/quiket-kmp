@@ -1,0 +1,38 @@
+# Gradle / Android build output
+.gradle/
+build/
+captures/
+.kotlin/
+.externalNativeBuild/
+.cxx/
+
+# Local environment
+local.properties
+iosApp/Configuration/Local.xcconfig
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Xcode local state
+xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.apk
+*.ap_
+*.aab
+*.dex
+
+# Signing keys and local secrets
+*.jks
+*.keystore
+*.p12
+*.pem
+.env
+.env.*

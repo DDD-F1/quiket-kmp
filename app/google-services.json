@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "981703117150",
+    "project_id": "quiket-86f58",
+    "storage_bucket": "quiket-86f58.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981703117150:android:7985ea661524ec538ce7cf",
+        "android_client_info": {
+          "package_name": "com.f1.quiket"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZVcrS_7os-_2rvmx3RVLgqyhKIEQhU6M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

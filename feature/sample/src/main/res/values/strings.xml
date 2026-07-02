@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pokemon_sample_title">Pokemon reference sample</string>
+    <string name="pokemon_sample_tab_all">All</string>
+    <string name="pokemon_sample_tab_liked">Liked</string>
+    <string name="pokemon_sample_like">Like</string>
+    <string name="pokemon_sample_unlike">Liked</string>
+    <string name="pokemon_sample_retry">Retry</string>
+    <string name="pokemon_sample_error_loading">목록을 불러오지 못했습니다.</string>
+    <string name="pokemon_sample_error_loading_more">다음 목록을 불러오지 못했습니다.</string>
+    <string name="pokemon_sample_empty_all">표시할 포켓몬이 없습니다.</string>
+    <string name="pokemon_sample_empty_liked">좋아요한 포켓몬이 없습니다.</string>
+    <string name="pokemon_sample_id_format">#%1$03d</string>
+</resources>
