@@ -8,8 +8,8 @@ import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayException
 import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
 import com.f1.quiket.composeapp.quiz.domain.usecase.QuizPlayUseCases
 import com.f1.quiket.composeapp.quiz.domain.model.toLaunchConfig
-import com.f1.quiket.composeapp.result.QuizResult
-import com.f1.quiket.composeapp.result.QuizResultException
+import com.f1.quiket.composeapp.result.domain.model.QuizResult
+import com.f1.quiket.composeapp.result.domain.model.QuizResultException
 import com.f1.quiket.composeapp.result.domain.usecase.QuizResultUseCases
 import com.f1.quiket.composeapp.util.generateUuid
 

@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.result.QuizResultClient
+import com.f1.quiket.composeapp.result.data.remote.QuizResultClient
 import com.f1.quiket.composeapp.result.data.remote.QuizResultRemoteDataSource
 import com.f1.quiket.composeapp.result.data.remote.QuizResultRemoteDataSourceImpl
 import com.f1.quiket.composeapp.result.data.repository.QuizResultRepositoryImpl

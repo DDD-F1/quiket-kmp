@@ -38,7 +38,7 @@ import com.f1.quiket.composeapp.quiz.domain.usecase.QuizPlayUseCases
 import com.f1.quiket.composeapp.quiz.presentation.QuizCreateStateHolder
 import com.f1.quiket.composeapp.quiz.presentation.QuizPlayStateHolder
 import com.f1.quiket.composeapp.quiz.presentation.QuizStartStateHolder
-import com.f1.quiket.composeapp.result.QuizResultClient
+import com.f1.quiket.composeapp.result.data.remote.QuizResultClient
 import com.f1.quiket.composeapp.result.data.remote.QuizResultRemoteDataSource
 import com.f1.quiket.composeapp.result.domain.repository.QuizResultRepository
 import com.f1.quiket.composeapp.result.domain.usecase.QuizResultUseCases

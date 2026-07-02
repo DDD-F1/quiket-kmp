@@ -65,6 +65,10 @@ import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayLaunchConfig
 import com.f1.quiket.composeapp.quiz.domain.model.QuizOption
 import com.f1.quiket.composeapp.quiz.domain.model.matchesAnswerValue
+import com.f1.quiket.composeapp.result.domain.model.QuestionOption
+import com.f1.quiket.composeapp.result.domain.model.QuizResult
+import com.f1.quiket.composeapp.result.domain.model.QuizReviewItem
+import com.f1.quiket.composeapp.result.domain.model.ResultPartSummary
 import com.f1.quiket.composeapp.result.presentation.QuizResultStateHolder
 import com.f1.quiket.composeapp.result.presentation.QuizResultUiState
 import kotlinx.coroutines.launch

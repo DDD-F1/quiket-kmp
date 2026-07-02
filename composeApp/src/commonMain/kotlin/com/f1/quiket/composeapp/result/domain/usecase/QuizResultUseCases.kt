@@ -1,8 +1,8 @@
 package com.f1.quiket.composeapp.result.domain.usecase
 
 import com.f1.quiket.composeapp.auth.domain.usecase.AuthenticatedCallRunner
-import com.f1.quiket.composeapp.result.QuizResult
-import com.f1.quiket.composeapp.result.QuizResultException
+import com.f1.quiket.composeapp.result.domain.model.QuizResult
+import com.f1.quiket.composeapp.result.domain.model.QuizResultException
 import com.f1.quiket.composeapp.result.domain.repository.QuizResultRepository
 
 internal class QuizResultUseCases(
