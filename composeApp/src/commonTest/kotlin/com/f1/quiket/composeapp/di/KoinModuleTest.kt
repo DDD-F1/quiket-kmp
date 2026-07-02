@@ -43,7 +43,7 @@ import com.f1.quiket.composeapp.result.data.remote.QuizResultRemoteDataSource
 import com.f1.quiket.composeapp.result.domain.repository.QuizResultRepository
 import com.f1.quiket.composeapp.result.domain.usecase.QuizResultUseCases
 import com.f1.quiket.composeapp.result.presentation.QuizResultStateHolder
-import com.f1.quiket.composeapp.review.ReviewClient
+import com.f1.quiket.composeapp.review.data.remote.ReviewClient
 import com.f1.quiket.composeapp.subject.data.remote.SubjectClient
 import com.f1.quiket.composeapp.subject.data.remote.SubjectRemoteDataSource
 import com.f1.quiket.composeapp.subject.domain.repository.SubjectRepository

@@ -1,8 +1,14 @@
-package com.f1.quiket.composeapp.review
+package com.f1.quiket.composeapp.review.data.remote
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.network.ApiEnvelope
 import com.f1.quiket.composeapp.network.ensureTrailingSlash
+import com.f1.quiket.composeapp.review.domain.model.QuestionOption
+import com.f1.quiket.composeapp.review.domain.model.QuizReview
+import com.f1.quiket.composeapp.review.domain.model.QuizReviewItem
+import com.f1.quiket.composeapp.review.domain.model.ReviewException
+import com.f1.quiket.composeapp.review.domain.model.ReviewFilter
+import com.f1.quiket.composeapp.review.domain.model.ReviewPartSummary
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -58,54 +64,6 @@ internal class ReviewClient(
             throw error
         }
 }
-
-internal class ReviewException(
-    message: String,
-    val isUnauthorized: Boolean = false,
-) : Exception(message)
-
-internal enum class ReviewFilter(
-    val wireValue: String,
-    val label: String,
-) {
-    All("all", "전체"),
-    Wrong("wrong", "오답만"),
-}
-
-internal data class QuizReview(
-    val playSessionId: String,
-    val items: List<QuizReviewItem>,
-)
-
-internal data class QuizReviewItem(
-    val questionId: String,
-    val displayOrder: Int,
-    val summary: String?,
-    val body: String,
-    val options: List<QuestionOption>,
-    val selectedOptionId: String?,
-    val selectedValue: String?,
-    val answerValue: String?,
-    val correctServer: Boolean,
-    val skipped: Boolean,
-    val correctExplanation: String?,
-    val incorrectExplanation: String?,
-    val sourcePart: ReviewPartSummary?,
-)
-
-internal data class QuestionOption(
-    val id: String,
-    val optionNumber: Int,
-    val content: String,
-)
-
-internal data class ReviewPartSummary(
-    val id: String,
-    val chapterId: String,
-    val name: String,
-    val partNumber: Int,
-    val contentPreview: String?,
-)
 
 @Serializable
 private data class QuizReviewDataResponse(

@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.review.ReviewClient
+import com.f1.quiket.composeapp.review.data.remote.ReviewClient
 import org.koin.dsl.module
 
 internal val reviewModule = module {
