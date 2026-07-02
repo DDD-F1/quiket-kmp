@@ -30,7 +30,7 @@ import com.f1.quiket.composeapp.mypage.domain.usecase.MyPageUseCases
 import com.f1.quiket.composeapp.mypage.presentation.AccountSettingsStateHolder
 import com.f1.quiket.composeapp.mypage.presentation.InquiryStateHolder
 import com.f1.quiket.composeapp.mypage.presentation.NotificationSettingsStateHolder
-import com.f1.quiket.composeapp.quiz.QuizPlayClient
+import com.f1.quiket.composeapp.quiz.data.remote.QuizPlayClient
 import com.f1.quiket.composeapp.quiz.data.remote.QuizPlayRemoteDataSource
 import com.f1.quiket.composeapp.quiz.domain.repository.QuizPlayRepository
 import com.f1.quiket.composeapp.quiz.domain.usecase.BuildQuizCreateRequestUseCase

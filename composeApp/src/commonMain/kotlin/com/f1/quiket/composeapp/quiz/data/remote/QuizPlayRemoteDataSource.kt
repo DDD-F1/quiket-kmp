@@ -4,7 +4,7 @@ import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.quiz.domain.model.QuizCreateRequest
 import com.f1.quiket.composeapp.quiz.domain.model.QuizGenerationAccepted
 import com.f1.quiket.composeapp.quiz.domain.model.QuizGenerationProgress
-import com.f1.quiket.composeapp.quiz.QuizPlayClient
+import com.f1.quiket.composeapp.quiz.data.remote.QuizPlayClient
 import com.f1.quiket.composeapp.quiz.domain.model.QuizPlaySession
 import com.f1.quiket.composeapp.quiz.domain.model.QuizPlayType
 import com.f1.quiket.composeapp.quiz.domain.model.QuizResultSubmit

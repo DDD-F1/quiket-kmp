@@ -1,4 +1,4 @@
-package com.f1.quiket.composeapp.quiz
+package com.f1.quiket.composeapp.quiz.data.remote
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.network.ApiEnvelope
