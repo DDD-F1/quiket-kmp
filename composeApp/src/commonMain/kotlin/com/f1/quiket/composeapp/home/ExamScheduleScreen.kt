@@ -68,16 +68,24 @@ import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.home.domain.model.SubjectSummary
+import com.f1.quiket.composeapp.home.presentation.ExamEditorMode
+import com.f1.quiket.composeapp.home.presentation.ExamScheduleItem
 import com.f1.quiket.composeapp.home.presentation.ExamScheduleStateHolder
+import com.f1.quiket.composeapp.home.presentation.ExamScheduleUiState
+import com.f1.quiket.composeapp.home.presentation.currentLocalDate
+import com.f1.quiket.composeapp.home.presentation.daysInMonth
+import com.f1.quiket.composeapp.home.presentation.firstDayOffset
+import com.f1.quiket.composeapp.home.presentation.formattedDate
+import com.f1.quiket.composeapp.home.presentation.koreanDayOfWeek
+import com.f1.quiket.composeapp.home.presentation.monthNumberValue
+import com.f1.quiket.composeapp.home.presentation.parsedDate
+import com.f1.quiket.composeapp.home.presentation.resolvedDDay
+import com.f1.quiket.composeapp.home.presentation.toIsoDate
+import com.f1.quiket.composeapp.home.presentation.toMonth
 import com.f1.quiket.composeapp.util.hidePlatformKeyboard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.Month
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 import org.jetbrains.compose.resources.painterResource
 import quiket.composeapp.generated.resources.Res
 import quiket.composeapp.generated.resources.ic_detail_edit
@@ -1192,97 +1200,3 @@ private fun DialogActionButton(
         }
     }
 }
-
-internal sealed interface ExamScheduleUiState {
-    data object Loading : ExamScheduleUiState
-    data class Success(
-        val exams: List<ExamScheduleItem>,
-        val subjects: List<SubjectSummary>,
-    ) : ExamScheduleUiState
-    data class Error(val message: String) : ExamScheduleUiState
-}
-
-internal sealed interface ExamEditorMode {
-    data object Add : ExamEditorMode
-    data class Edit(val exam: ExamScheduleItem) : ExamEditorMode
-}
-
-internal data class ExamScheduleItem(
-    val id: String,
-    val subjectId: String,
-    val subjectName: String,
-    val examName: String,
-    val examDate: String,
-    val dDay: Int?,
-)
-
-internal fun List<SubjectSummary>.toExamScheduleItems(): List<ExamScheduleItem> =
-    mapNotNull { subject ->
-        subject.examSchedule?.let { schedule ->
-            ExamScheduleItem(
-                id = schedule.id,
-                subjectId = schedule.subjectId,
-                subjectName = subject.name,
-                examName = schedule.examName,
-                examDate = schedule.examDate,
-                dDay = schedule.dDay,
-            )
-        }
-    }
-        .filter { (it.resolvedDDay() ?: 0) >= 0 }
-        .distinctBy { it.subjectId }
-        .sortedBy { it.resolvedDDay() ?: Int.MAX_VALUE }
-
-private fun ExamScheduleItem.parsedDate(): LocalDate? =
-    parseExamDate(examDate)
-
-private fun ExamScheduleItem.resolvedDDay(): Int? =
-    dDay ?: parsedDate()?.let { (it.toEpochDays() - currentLocalDate().toEpochDays()).toInt() }
-
-private fun ExamScheduleItem.formattedDate(): String {
-    val date = parsedDate() ?: return examDate
-    return "${date.year}.${date.monthNumberValue().twoDigits()}.${date.day.twoDigits()} ${date.koreanDayOfWeek()}"
-}
-
-private fun parseExamDate(raw: String): LocalDate? {
-    val parts = raw.split("-", ".")
-    if (parts.size < 3) return null
-    return runCatching {
-        LocalDate(
-            year = parts[0].toInt(),
-            month = parts[1].toInt().toMonth(),
-            day = parts[2].toInt(),
-        )
-    }.getOrNull()
-}
-
-private fun firstDayOffset(year: Int, month: Int): Int =
-    LocalDate(year, month.toMonth(), 1).dayOfWeek.ordinal
-
-private fun daysInMonth(year: Int, month: Int): Int {
-    val start = LocalDate(year, month.toMonth(), 1)
-    val next = if (month == 12) {
-        LocalDate(year + 1, Month.JANUARY, 1)
-    } else {
-        LocalDate(year, (month + 1).toMonth(), 1)
-    }
-    return (next.toEpochDays() - start.toEpochDays()).toInt()
-}
-
-private fun LocalDate.koreanDayOfWeek(): String =
-    listOf("월", "화", "수", "목", "금", "토", "일")[dayOfWeek.ordinal]
-
-private fun Int.twoDigits(): String = if (this < 10) "0$this" else toString()
-
-private fun LocalDate.toIsoDate(): String =
-    "${year}-${monthNumberValue().twoDigits()}-${day.twoDigits()}"
-
-private fun LocalDate.monthNumberValue(): Int =
-    month.ordinal + 1
-
-private fun Int.toMonth(): Month =
-    Month.entries[this - 1]
-
-@OptIn(ExperimentalTime::class)
-private fun currentLocalDate(): LocalDate =
-    Clock.System.todayIn(TimeZone.currentSystemDefault())

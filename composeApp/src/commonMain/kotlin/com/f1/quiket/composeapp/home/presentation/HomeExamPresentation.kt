@@ -85,11 +85,6 @@ private fun parseHomeDate(raw: String): LocalDate? {
 private fun Int.toHomeMonth(): Month =
     Month.entries[this - 1]
 
-private fun LocalDate.monthNumberValue(): Int =
-    month.ordinal + 1
-
-private fun Int.twoDigits(): String = if (this < 10) "0$this" else toString()
-
 @OptIn(ExperimentalTime::class)
 private fun currentHomeDate(): LocalDate =
     Clock.System.todayIn(TimeZone.currentSystemDefault())
