@@ -1,6 +1,6 @@
 package com.f1.quiket.composeapp.di
 
-import com.f1.quiket.composeapp.history.HistoryClient
+import com.f1.quiket.composeapp.history.data.remote.HistoryClient
 import com.f1.quiket.composeapp.history.data.remote.HistoryRemoteDataSource
 import com.f1.quiket.composeapp.history.data.remote.HistoryRemoteDataSourceImpl
 import com.f1.quiket.composeapp.history.data.repository.HistoryRepositoryImpl

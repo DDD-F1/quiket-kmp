@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.f1.quiket.composeapp.auth.domain.usecase.ReadSessionUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.SaveHomeGuideCompletedUseCase
-import com.f1.quiket.composeapp.history.HistoryActivity
-import com.f1.quiket.composeapp.history.HistoryException
+import com.f1.quiket.composeapp.history.domain.model.HistoryActivity
+import com.f1.quiket.composeapp.history.domain.model.HistoryException
 import com.f1.quiket.composeapp.history.domain.usecase.HistoryUseCases
 import com.f1.quiket.composeapp.home.HomeData
 import com.f1.quiket.composeapp.home.HomeException

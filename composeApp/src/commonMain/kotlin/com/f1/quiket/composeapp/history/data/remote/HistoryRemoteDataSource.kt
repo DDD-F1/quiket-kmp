@@ -1,8 +1,7 @@
 package com.f1.quiket.composeapp.history.data.remote
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.history.HistoryClient
-import com.f1.quiket.composeapp.history.RecentActivityPage
+import com.f1.quiket.composeapp.history.domain.model.RecentActivityPage
 
 internal interface HistoryRemoteDataSource {
     suspend fun getRecentActivities(

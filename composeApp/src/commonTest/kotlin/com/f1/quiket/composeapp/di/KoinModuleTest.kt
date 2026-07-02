@@ -13,7 +13,7 @@ import com.f1.quiket.composeapp.auth.domain.usecase.LinkKakaoAccountUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.RequestPasswordResetUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.SaveHomeGuideCompletedUseCase
 import com.f1.quiket.composeapp.auth.presentation.AuthStateHolder
-import com.f1.quiket.composeapp.history.HistoryClient
+import com.f1.quiket.composeapp.history.data.remote.HistoryClient
 import com.f1.quiket.composeapp.history.data.remote.HistoryRemoteDataSource
 import com.f1.quiket.composeapp.history.domain.repository.HistoryRepository
 import com.f1.quiket.composeapp.history.domain.usecase.HistoryUseCases

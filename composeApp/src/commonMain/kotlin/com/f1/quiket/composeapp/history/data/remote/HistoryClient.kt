@@ -1,6 +1,10 @@
-package com.f1.quiket.composeapp.history
+package com.f1.quiket.composeapp.history.data.remote
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
+import com.f1.quiket.composeapp.history.domain.model.HistoryActivity
+import com.f1.quiket.composeapp.history.domain.model.HistoryActivityType
+import com.f1.quiket.composeapp.history.domain.model.HistoryException
+import com.f1.quiket.composeapp.history.domain.model.RecentActivityPage
 import com.f1.quiket.composeapp.network.ApiEnvelope
 import com.f1.quiket.composeapp.network.ensureTrailingSlash
 import io.ktor.client.HttpClient
@@ -58,47 +62,6 @@ internal class HistoryClient(
             }
             throw error
         }
-}
-
-internal class HistoryException(
-    message: String,
-    val isUnauthorized: Boolean = false,
-) : Exception(message)
-
-internal data class RecentActivityPage(
-    val activities: List<HistoryActivity>,
-    val page: Int,
-    val size: Int,
-    val totalElements: Long,
-    val totalPages: Int,
-    val hasNext: Boolean,
-)
-
-internal data class HistoryActivity(
-    val activityId: String,
-    val activityType: HistoryActivityType,
-    val quizSessionId: String?,
-    val clientSessionId: String?,
-    val playSessionId: String?,
-    val resultId: String?,
-    val title: String,
-    val subjectId: String,
-    val subjectName: String,
-    val status: String?,
-    val progressPct: Int?,
-    val scoreText: String?,
-    val createdAt: String,
-)
-
-internal enum class HistoryActivityType(
-    val wireValue: String,
-) {
-    QuizGenerating("quiz_generating"),
-    QuizReady("quiz_ready"),
-    QuizInProgress("quiz_in_progress"),
-    QuizCompleted("quiz_completed"),
-    LectureUploaded("lecture_uploaded"),
-    Unknown("unknown"),
 }
 
 @Serializable

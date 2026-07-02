@@ -1,7 +1,7 @@
 package com.f1.quiket.composeapp.history.data.repository
 
 import com.f1.quiket.composeapp.auth.SessionSnapshot
-import com.f1.quiket.composeapp.history.RecentActivityPage
+import com.f1.quiket.composeapp.history.domain.model.RecentActivityPage
 import com.f1.quiket.composeapp.history.data.remote.HistoryRemoteDataSource
 import com.f1.quiket.composeapp.history.domain.repository.HistoryRepository
 

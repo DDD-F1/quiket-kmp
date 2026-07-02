@@ -88,7 +88,7 @@ import com.f1.quiket.composeapp.designsystem.QuiketNegative
 import com.f1.quiket.composeapp.designsystem.QuiketOrange500
 import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
-import com.f1.quiket.composeapp.history.HistoryActivityType
+import com.f1.quiket.composeapp.history.domain.model.HistoryActivityType
 import com.f1.quiket.composeapp.home.ExamScheduleRoute
 import com.f1.quiket.composeapp.home.RecentActivity
 import com.f1.quiket.composeapp.home.SubjectSummary

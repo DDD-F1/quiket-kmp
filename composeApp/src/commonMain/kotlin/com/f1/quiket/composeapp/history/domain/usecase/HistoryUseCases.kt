@@ -1,8 +1,8 @@
 package com.f1.quiket.composeapp.history.domain.usecase
 
 import com.f1.quiket.composeapp.auth.domain.usecase.AuthenticatedCallRunner
-import com.f1.quiket.composeapp.history.HistoryException
-import com.f1.quiket.composeapp.history.RecentActivityPage
+import com.f1.quiket.composeapp.history.domain.model.HistoryException
+import com.f1.quiket.composeapp.history.domain.model.RecentActivityPage
 import com.f1.quiket.composeapp.history.domain.repository.HistoryRepository
 
 internal class HistoryUseCases(

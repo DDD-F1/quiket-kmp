@@ -41,8 +41,8 @@ import com.f1.quiket.composeapp.designsystem.QuiketOrange500
 import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketTopBar
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
-import com.f1.quiket.composeapp.history.HistoryActivity
-import com.f1.quiket.composeapp.history.HistoryActivityType
+import com.f1.quiket.composeapp.history.domain.model.HistoryActivity
+import com.f1.quiket.composeapp.history.domain.model.HistoryActivityType
 
 @Composable
 internal fun HistoryTab(
