@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -19,7 +19,7 @@
 		740EB4054C3674D9C20B9720 /* Preview Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		7BAB4BBC90A70AE68CB9A27F /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		878FCFE3154B88B0E56CF6F9 /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		ABA9F0E94440DC64B1128C7D /* iosApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iosApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ABA9F0E94440DC64B1128C7D /* Quiket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Quiket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AE7FCEAC3DE928B52D25E51B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		BF96D59D8C02D5177C6AE1EA /* iOSApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = iOSApp.swift; sourceTree = "<group>"; };
 		BF9D35E6BB79B5B8CD01873E /* Config.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
@@ -49,7 +49,7 @@
 		3138B4366A1D69D0D5C47616 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				ABA9F0E94440DC64B1128C7D /* iosApp.app */,
+				ABA9F0E94440DC64B1128C7D /* Quiket.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -63,7 +63,6 @@
 				878FCFE3154B88B0E56CF6F9 /* Assets.xcassets */,
 				FF902E0AB3A4E85CD605BE3C /* Preview Content */,
 			);
-			name = iosApp;
 			path = iosApp;
 			sourceTree = "<group>";
 		};
@@ -89,7 +88,6 @@
 			children = (
 				BF9D35E6BB79B5B8CD01873E /* Config.xcconfig */,
 			);
-			name = Configuration;
 			path = Configuration;
 			sourceTree = "<group>";
 		};
@@ -106,7 +104,6 @@
 			children = (
 				740EB4054C3674D9C20B9720 /* Preview Assets.xcassets */,
 			);
-			name = "Preview Content";
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
@@ -131,7 +128,7 @@
 				A1B2C3D4E5F60718293A4B5D /* KakaoSDKUser */,
 			);
 			productName = iosApp;
-			productReference = ABA9F0E94440DC64B1128C7D /* iosApp.app */;
+			productReference = ABA9F0E94440DC64B1128C7D /* Quiket.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -152,11 +149,9 @@
 				Base,
 			);
 			mainGroup = CB64DEB6EE4E6185C4DEE14B;
-			minimizedProjectReferenceProxies = 0;
 			packageReferences = (
 				A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */,
 			);
-			preferredProjectObjectVersion = 77;
 			productRefGroup = 3138B4366A1D69D0D5C47616 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -212,25 +207,6 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.28.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A1B2C3D4E5F60718293A4B5D /* KakaoSDKUser */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
-			productName = KakaoSDKUser;
-		};
-/* End XCSwiftPackageProductDependency section */
-
 /* Begin XCBuildConfiguration section */
 		A4533901F6351200B662D6F5 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -250,7 +226,10 @@
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
@@ -402,7 +381,10 @@
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-framework",
@@ -438,6 +420,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kakao/kakao-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.28.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1B2C3D4E5F60718293A4B5D /* KakaoSDKUser */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F60718293A4B5C /* XCRemoteSwiftPackageReference "kakao-ios-sdk" */;
+			productName = KakaoSDKUser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 153F3FB27E49AAD9E27A6B68 /* Project object */;
 }

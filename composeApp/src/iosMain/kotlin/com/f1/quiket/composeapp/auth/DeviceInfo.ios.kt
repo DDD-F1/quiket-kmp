@@ -7,5 +7,5 @@ internal actual object DeviceInfo {
         get() = UIDevice.currentDevice.identifierForVendor?.UUIDString ?: "quiket-ios"
 
     actual val deviceName: String
-        get() = UIDevice.currentDevice.name.ifBlank { "iOS" }
+        get() = UIDevice.currentDevice.model.ifBlank { "iOS" }
 }

@@ -467,7 +467,7 @@ private data class PasswordResetConfirmRequest(
 @Serializable
 private data class KakaoLoginRequest(
     val kakaoAccessToken: String,
-    val agreedToTerms: Boolean = true,
+    val agreedToTerms: Boolean,
 )
 
 @Serializable
