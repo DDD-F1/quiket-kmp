@@ -62,6 +62,8 @@ iosApp/
 - [docs/codex-preflight.md](./docs/codex-preflight.md): 작업 전 확인 및 검증 명령
 - [docs/compose-screen-conventions.md](./docs/compose-screen-conventions.md): Compose/Compose Multiplatform 화면 작성 규칙
 - [docs/module-conventions.md](./docs/module-conventions.md): Compose Multiplatform source set/resource/DI 규칙
+- [docs/openapi.yaml](./docs/openapi.yaml): 백엔드 OpenAPI `3.0.3` / Quiket API `1.1.0` 동기화 사본
+- [docs/api-contract.md](./docs/api-contract.md): 앱 OAuth 계약과 구현 상태
 - [docs/kmp-current-status.md](./docs/kmp-current-status.md): Compose Multiplatform 기준 구조와 완료 상태 요약
 - [docs/kmp-migration-parity.md](./docs/kmp-migration-parity.md): Android/Compose Multiplatform 대조 QA 상세 로그
 

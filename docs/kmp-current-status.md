@@ -1,6 +1,6 @@
 # Compose Multiplatform Architecture Baseline
 
-Last updated: 2026-07-01
+Last updated: 2026-07-10
 
 ## Branch Model
 
@@ -37,6 +37,8 @@ Use Android `dev` only as the visual and behavioral QA reference. Compose Multip
 - Home, history, my page dashboard, account settings, notification settings, inquiry, subject create/detail/edit, upload, material check, quiz create/start/play/result routes call use cases instead of API clients.
 - Quiz create request policy is moved behind `BuildQuizCreateRequestUseCase`.
 - Review tab remains a placeholder and intentionally has no API dependency until the feature UI is implemented.
+- Backend OpenAPI `3.0.3` / Quiket API `1.1.0` snapshot is tracked in `docs/openapi.yaml`; the app-facing OAuth contract is summarized in `docs/api-contract.md`.
+- Apple OAuth KMP client, iOS Sign in with Apple bridge, Apple UI, and shared nickname/account-link routes are implemented. Real-device and backend-flow QA remain.
 
 ## QA Parity Baseline
 
@@ -49,11 +51,12 @@ Detailed evidence lives in `docs/kmp-migration-parity.md`. High-level QA parity 
 - Material check and lecture view: Android parity work complete
 - Quiz create/start/play/result/review detail: major parity issues addressed
 - Session refresh: Compose Multiplatform refresh serialization added
-- API spec changes: latest known result/upload/review path and response updates reflected or confirmed
+- API spec changes: OpenAPI `1.1.0` snapshot synchronized; Apple OAuth client implementation added
 
 ## Runtime Verification Requirements
 
 - Kakao login real-device verification
+- Apple login real-device verification, including first authorization, repeat login, nickname setup, and account linking
 - Lottie animation final real-device verification
 - Push/notification token registration, if product scope requires it
 - QA data cleanup on the shared backend
