@@ -12,7 +12,9 @@ class MainActivity : ComponentActivity() {
         AndroidSessionContext.init(applicationContext)
         initKoin()
         setContent {
-            QuiketApp()
+            QuiketApp(
+                isAppleLoginAvailable = false,
+            )
         }
     }
 }
