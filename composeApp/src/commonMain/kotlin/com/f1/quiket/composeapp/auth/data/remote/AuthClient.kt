@@ -2,6 +2,9 @@ package com.f1.quiket.composeapp.auth.data.remote
 
 import com.f1.quiket.composeapp.auth.DeviceInfo
 import com.f1.quiket.composeapp.auth.SessionSnapshot
+import com.f1.quiket.composeapp.auth.domain.model.AppleAccountLinkRequired
+import com.f1.quiket.composeapp.auth.domain.model.AppleLoginResult
+import com.f1.quiket.composeapp.auth.domain.model.AppleNicknameRequired
 import com.f1.quiket.composeapp.auth.domain.model.AuthException
 import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.domain.model.AuthUser
@@ -256,6 +259,128 @@ internal class AuthClient(
         ).toDomain()
     }
 
+    suspend fun appleLogin(
+        identityToken: String,
+        authorizationCode: String?,
+        fullName: String?,
+        agreedToTerms: Boolean = true,
+    ): AppleLoginResult {
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}auth/oauth/apple/login") {
+            contentType(ContentType.Application.Json)
+            header("X-Device-Id", DeviceInfo.deviceId)
+            header("X-Device-Name", DeviceInfo.deviceName)
+            setBody(
+                AppleLoginRequest(
+                    identityToken = identityToken,
+                    authorizationCode = authorizationCode,
+                    fullName = fullName,
+                    agreedToTerms = agreedToTerms,
+                ),
+            )
+        }
+
+        val body = response.bodyAsText()
+        val envelope = parseEnvelope(body)
+        val data = envelope.data
+
+        if (response.status.value == HttpConflict) {
+            val linkRequired = data?.let { element ->
+                runCatching {
+                    json.decodeFromJsonElement<AppleAccountLinkRequired>(element)
+                }.getOrNull()
+            }
+            return if (linkRequired != null) {
+                AppleLoginResult.AccountLinkRequired(linkRequired)
+            } else {
+                AppleLoginResult.Failure(
+                    envelope.message.ifBlank { "Apple 계정 연결 정보를 해석하지 못했습니다." },
+                )
+            }
+        }
+
+        if (response.status.value !in 200..299 || !envelope.success) {
+            return AppleLoginResult.Failure(envelope.message.ifBlank { "Apple 로그인에 실패했습니다." })
+        }
+
+        if (data == null) {
+            return AppleLoginResult.Failure("Apple 로그인 응답 데이터가 비어 있습니다.")
+        }
+
+        return when (response.status.value) {
+            HttpOk, HttpCreated -> {
+                val tokenResponse = runCatching {
+                    json.decodeFromJsonElement<AuthTokenDataResponse>(data)
+                }.getOrNull()
+                if (tokenResponse == null) {
+                    AppleLoginResult.Failure("Apple 로그인 응답을 해석하지 못했습니다.")
+                } else {
+                    AppleLoginResult.LoggedIn(tokenResponse.toDomain())
+                }
+            }
+
+            HttpAccepted -> {
+                val nicknameRequired = runCatching {
+                    json.decodeFromJsonElement<AppleNicknameRequired>(data)
+                }.getOrNull()
+                if (nicknameRequired == null) {
+                    AppleLoginResult.Failure("Apple 닉네임 설정 정보를 해석하지 못했습니다.")
+                } else {
+                    AppleLoginResult.NicknameRequired(nicknameRequired)
+                }
+            }
+
+            else -> AppleLoginResult.Failure("예상하지 못한 Apple 로그인 응답입니다.")
+        }
+    }
+
+    suspend fun linkAppleAccount(
+        linkToken: String,
+        email: String,
+        password: String,
+    ): AuthTokenData {
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}auth/oauth/apple/link") {
+            contentType(ContentType.Application.Json)
+            header("X-Device-Id", DeviceInfo.deviceId)
+            header("X-Device-Name", DeviceInfo.deviceName)
+            setBody(
+                AppleAccountLinkRequest(
+                    linkToken = linkToken,
+                    email = email,
+                    password = password,
+                ),
+            )
+        }
+
+        return decodeResponse<AuthTokenDataResponse>(
+            response = response,
+            failureMessage = "Apple 계정 연결에 실패했습니다.",
+            missingMessage = "Apple 계정 연결 응답에 토큰 정보가 없습니다.",
+        ).toDomain()
+    }
+
+    suspend fun completeAppleNickname(
+        signupToken: String,
+        nickname: String,
+    ): AuthTokenData {
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}auth/oauth/apple/nickname") {
+            contentType(ContentType.Application.Json)
+            header("X-Device-Id", DeviceInfo.deviceId)
+            header("X-Device-Name", DeviceInfo.deviceName)
+            setBody(
+                AppleNicknameRequest(
+                    signupToken = signupToken,
+                    nickname = nickname,
+                ),
+            )
+        }
+
+        return decodeResponse<AuthTokenDataResponse>(
+            response = response,
+            failureMessage = "Apple 닉네임 설정에 실패했습니다.",
+            missingMessage = "Apple 닉네임 설정 응답에 토큰 정보가 없습니다.",
+        ).toDomain()
+    }
+
     suspend fun completeKakaoNickname(
         signupToken: String,
         nickname: String,
@@ -480,6 +605,27 @@ private data class KakaoAccountLinkRequest(
 
 @Serializable
 private data class KakaoNicknameRequest(
+    val signupToken: String,
+    val nickname: String,
+)
+
+@Serializable
+private data class AppleLoginRequest(
+    val identityToken: String,
+    val authorizationCode: String? = null,
+    val fullName: String? = null,
+    val agreedToTerms: Boolean,
+)
+
+@Serializable
+private data class AppleAccountLinkRequest(
+    val linkToken: String,
+    val email: String,
+    val password: String,
+)
+
+@Serializable
+private data class AppleNicknameRequest(
     val signupToken: String,
     val nickname: String,
 )

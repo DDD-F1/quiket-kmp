@@ -6,38 +6,52 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import com.f1.quiket.composeapp.auth.domain.model.AppleAccountLinkRequired
+import com.f1.quiket.composeapp.auth.domain.model.AppleNicknameRequired
 import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.domain.model.KakaoAccountLinkRequired
 import com.f1.quiket.composeapp.auth.domain.model.KakaoNicknameRequired
-import com.f1.quiket.composeapp.auth.presentation.AuthStateHolder
 import com.f1.quiket.composeapp.network.toUserFacingMessage
 import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
-internal data class KakaoAuthDraft(
+internal data class OAuthAuthDraft(
     val signupToken: String = "",
     val suggestedNickname: String? = null,
     val linkToken: String = "",
     val linkEmail: String = "",
 )
 
-internal fun KakaoNicknameRequired.toDraft(): KakaoAuthDraft =
-    KakaoAuthDraft(
+internal fun KakaoNicknameRequired.toOAuthDraft(): OAuthAuthDraft =
+    OAuthAuthDraft(
         signupToken = signupToken,
         suggestedNickname = suggestedNickname,
     )
 
-internal fun KakaoAccountLinkRequired.toDraft(): KakaoAuthDraft =
-    KakaoAuthDraft(
+internal fun KakaoAccountLinkRequired.toOAuthDraft(): OAuthAuthDraft =
+    OAuthAuthDraft(
+        linkToken = linkToken,
+        linkEmail = email,
+    )
+
+internal fun AppleNicknameRequired.toOAuthDraft(): OAuthAuthDraft =
+    OAuthAuthDraft(
+        signupToken = signupToken,
+        suggestedNickname = suggestedNickname,
+    )
+
+internal fun AppleAccountLinkRequired.toOAuthDraft(): OAuthAuthDraft =
+    OAuthAuthDraft(
         linkToken = linkToken,
         linkEmail = email,
     )
 
 @Composable
-internal fun KakaoNicknameRoute(
-    draft: KakaoAuthDraft,
+internal fun OAuthNicknameRoute(
+    draft: OAuthAuthDraft,
+    providerName: String,
     onBackClick: () -> Unit,
     onComplete: (AuthTokenData) -> Unit,
+    onCompleteNickname: suspend (signupToken: String, nickname: String) -> AuthTokenData,
 ) {
     var nickname by remember(draft.suggestedNickname) {
         mutableStateOf(draft.suggestedNickname.orEmpty().take(SignUpNicknameMaxLength))
@@ -45,7 +59,6 @@ internal fun KakaoNicknameRoute(
     var nicknameErrorMessage by remember { mutableStateOf<String?>(null) }
     var isSubmitting by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    val authStateHolder = koinInject<AuthStateHolder>()
 
     fun updateNickname(nextValue: String) {
         val next = nextValue.take(SignUpNicknameMaxLength)
@@ -69,14 +82,11 @@ internal fun KakaoNicknameRoute(
         nicknameErrorMessage = null
         coroutineScope.launch {
             runCatching {
-                authStateHolder.completeKakaoNickname(
-                    signupToken = draft.signupToken,
-                    nickname = trimmedNickname,
-                )
+                onCompleteNickname(draft.signupToken, trimmedNickname)
             }.onSuccess { tokenData ->
                 onComplete(tokenData)
             }.onFailure { error ->
-                nicknameErrorMessage = error.toUserFacingMessage("카카오 닉네임 설정에 실패했습니다.")
+                nicknameErrorMessage = error.toUserFacingMessage("$providerName 닉네임 설정에 실패했습니다.")
             }
             isSubmitting = false
         }
@@ -93,17 +103,18 @@ internal fun KakaoNicknameRoute(
 }
 
 @Composable
-internal fun KakaoAccountLinkRoute(
-    draft: KakaoAuthDraft,
+internal fun OAuthAccountLinkRoute(
+    draft: OAuthAuthDraft,
+    providerName: String,
     onBackClick: () -> Unit,
     onComplete: (AuthTokenData) -> Unit,
+    onLinkAccount: suspend (linkToken: String, email: String, password: String) -> AuthTokenData,
 ) {
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isSubmitting by remember { mutableStateOf(false) }
     var passwordErrorMessage by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val authStateHolder = koinInject<AuthStateHolder>()
 
     fun submit() {
         if (password.isBlank() || isSubmitting) return
@@ -112,15 +123,11 @@ internal fun KakaoAccountLinkRoute(
         passwordErrorMessage = null
         coroutineScope.launch {
             runCatching {
-                authStateHolder.linkKakaoAccount(
-                    linkToken = draft.linkToken,
-                    email = draft.linkEmail,
-                    password = password,
-                )
+                onLinkAccount(draft.linkToken, draft.linkEmail, password)
             }.onSuccess { tokenData ->
                 onComplete(tokenData)
             }.onFailure { error ->
-                passwordErrorMessage = error.toUserFacingMessage("카카오 계정 연결에 실패했습니다.")
+                passwordErrorMessage = error.toUserFacingMessage("$providerName 계정 연결에 실패했습니다.")
             }
             isSubmitting = false
         }

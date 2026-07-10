@@ -62,6 +62,7 @@ kotlin {
             implementation(project.dependencies.platform(libs.koin.bom))
             implementation(libs.koin.test)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
         }
     }
 }
@@ -74,7 +75,7 @@ android {
         applicationId = "com.f1.quiket.composeapp"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
+        versionCode = 7
         versionName = "1.4"
     }
 }

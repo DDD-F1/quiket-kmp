@@ -6,7 +6,7 @@ internal actual object DeviceInfo {
     actual val deviceId: String = "quiket-android"
 
     actual val deviceName: String
-        get() = listOf(Build.MANUFACTURER, Build.MODEL)
+        get() = listOf(Build.MANUFACTURER.orEmpty(), Build.MODEL.orEmpty())
             .filter { it.isNotBlank() }
             .joinToString(separator = " ")
             .ifBlank { "Android" }

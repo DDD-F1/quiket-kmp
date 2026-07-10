@@ -6,10 +6,13 @@ import com.f1.quiket.composeapp.auth.domain.repository.AuthRepository
 import com.f1.quiket.composeapp.auth.domain.repository.SessionRepository
 import com.f1.quiket.composeapp.auth.domain.usecase.CheckEmailAvailabilityUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.AuthenticatedCallRunner
+import com.f1.quiket.composeapp.auth.domain.usecase.AppleLoginUseCase
+import com.f1.quiket.composeapp.auth.domain.usecase.CompleteAppleNicknameUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.CompleteKakaoNicknameUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ConfirmEmailVerificationUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ConfirmPasswordResetUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.LinkKakaoAccountUseCase
+import com.f1.quiket.composeapp.auth.domain.usecase.LinkAppleAccountUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.RequestPasswordResetUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.SaveHomeGuideCompletedUseCase
 import com.f1.quiket.composeapp.auth.presentation.AuthStateHolder
@@ -80,8 +83,11 @@ class KoinModuleTest {
             assertNotNull(get<AuthenticatedCallRunner>())
             assertNotNull(get<CheckEmailAvailabilityUseCase>())
             assertNotNull(get<ConfirmEmailVerificationUseCase>())
+            assertNotNull(get<AppleLoginUseCase>())
             assertNotNull(get<CompleteKakaoNicknameUseCase>())
+            assertNotNull(get<CompleteAppleNicknameUseCase>())
             assertNotNull(get<LinkKakaoAccountUseCase>())
+            assertNotNull(get<LinkAppleAccountUseCase>())
             assertNotNull(get<RequestPasswordResetUseCase>())
             assertNotNull(get<ConfirmPasswordResetUseCase>())
             assertNotNull(get<SaveHomeGuideCompletedUseCase>())

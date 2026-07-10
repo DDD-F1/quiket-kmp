@@ -32,6 +32,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.f1.quiket.composeapp.designsystem.QuiketBlack
 import com.f1.quiket.composeapp.designsystem.QuiketGray700
 import com.f1.quiket.composeapp.designsystem.QuiketNegative
@@ -51,10 +52,14 @@ fun LoginScreen(
     onBackClick: () -> Unit,
     onQuiketLoginClick: () -> Unit,
     onKakaoLoginClick: () -> Unit,
+    onAppleLoginClick: () -> Unit,
     onSignUpClick: () -> Unit,
     modifier: Modifier = Modifier,
     isKakaoLoading: Boolean = false,
     kakaoErrorMessage: String? = null,
+    isAppleLoginVisible: Boolean = false,
+    isAppleLoading: Boolean = false,
+    appleErrorMessage: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -73,7 +78,7 @@ fun LoginScreen(
                 .align(Alignment.TopCenter)
                 .padding(horizontal = 16.dp)
                 .padding(top = 144.dp)
-                .height(558.dp),
+                .height(if (isAppleLoginVisible) 634.dp else 558.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(36.dp),
         ) {
@@ -82,9 +87,13 @@ fun LoginScreen(
             LoginActionArea(
                 onQuiketLoginClick = onQuiketLoginClick,
                 onKakaoLoginClick = onKakaoLoginClick,
+                onAppleLoginClick = onAppleLoginClick,
                 onSignUpClick = onSignUpClick,
                 isKakaoLoading = isKakaoLoading,
                 kakaoErrorMessage = kakaoErrorMessage,
+                isAppleLoginVisible = isAppleLoginVisible,
+                isAppleLoading = isAppleLoading,
+                appleErrorMessage = appleErrorMessage,
             )
         }
     }
@@ -178,37 +187,52 @@ private fun BackButton(
 private fun LoginActionArea(
     onQuiketLoginClick: () -> Unit,
     onKakaoLoginClick: () -> Unit,
+    onAppleLoginClick: () -> Unit,
     onSignUpClick: () -> Unit,
     modifier: Modifier = Modifier,
     isKakaoLoading: Boolean = false,
     kakaoErrorMessage: String? = null,
+    isAppleLoginVisible: Boolean = false,
+    isAppleLoading: Boolean = false,
+    appleErrorMessage: String? = null,
 ) {
+    val socialErrorMessage = appleErrorMessage ?: kakaoErrorMessage
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(176.dp),
+            .height(if (isAppleLoginVisible) 252.dp else 176.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        /*
         QuiketPrimaryButton(
             text = "Quiket 로그인",
             onClick = onQuiketLoginClick,
         )
         Spacer(modifier = Modifier.height(12.dp))
+        */
         KakaoLoginButton(
             isLoading = isKakaoLoading,
             onClick = onKakaoLoginClick,
         )
-        if (!kakaoErrorMessage.isNullOrBlank()) {
+        if (isAppleLoginVisible) {
+            Spacer(modifier = Modifier.height(12.dp))
+            AppleLoginButton(
+                isLoading = isAppleLoading,
+                onClick = onAppleLoginClick,
+            )
+        }
+        if (!socialErrorMessage.isNullOrBlank()) {
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = kakaoErrorMessage,
+                text = socialErrorMessage,
                 color = QuiketNegative,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.labelSmall,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-        Spacer(modifier = Modifier.height(if (kakaoErrorMessage.isNullOrBlank()) 20.dp else 8.dp))
+        Spacer(modifier = Modifier.height(if (socialErrorMessage.isNullOrBlank()) 20.dp else 8.dp))
         SignUpText(onClick = onSignUpClick)
     }
 }
@@ -232,6 +256,30 @@ private fun KakaoLoginButton(
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier.size(24.dp),
+            )
+        },
+    )
+}
+
+@Composable
+private fun AppleLoginButton(
+    isLoading: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    QuiketPrimaryButton(
+        text = if (isLoading) "Apple 로그인 중..." else "Apple로 계속하기",
+        containerColor = QuiketBlack,
+        contentColor = QuiketWhite,
+        enabled = !isLoading,
+        onClick = onClick,
+        modifier = modifier,
+        leadingIcon = {
+            Text(
+                text = "\uF8FF",
+                color = QuiketWhite,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Medium,
             )
         },
     )

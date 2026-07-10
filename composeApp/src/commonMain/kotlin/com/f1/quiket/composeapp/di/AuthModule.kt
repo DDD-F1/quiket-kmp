@@ -8,15 +8,18 @@ import com.f1.quiket.composeapp.auth.data.repository.SessionRepositoryImpl
 import com.f1.quiket.composeapp.auth.domain.repository.AuthRepository
 import com.f1.quiket.composeapp.auth.domain.repository.SessionRepository
 import com.f1.quiket.composeapp.auth.domain.usecase.AuthenticatedCallRunner
+import com.f1.quiket.composeapp.auth.domain.usecase.AppleLoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.CheckEmailAvailabilityUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ClearAuthUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.CompleteKakaoNicknameUseCase
+import com.f1.quiket.composeapp.auth.domain.usecase.CompleteAppleNicknameUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.CompleteLoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ConfirmEmailVerificationUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ConfirmPasswordResetUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.GetCurrentUserUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.KakaoLoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.LinkKakaoAccountUseCase
+import com.f1.quiket.composeapp.auth.domain.usecase.LinkAppleAccountUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.LoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.LogoutUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ReadSessionUseCase
@@ -48,11 +51,14 @@ internal val authModule = module {
     single { CheckEmailAvailabilityUseCase(authRepository = get()) }
     single { LoginUseCase(authRepository = get()) }
     single { KakaoLoginUseCase(authRepository = get()) }
+    single { AppleLoginUseCase(authRepository = get()) }
     single { SignupUseCase(authRepository = get()) }
     single { ResendEmailVerificationUseCase(authRepository = get()) }
     single { ConfirmEmailVerificationUseCase(authRepository = get()) }
     single { CompleteKakaoNicknameUseCase(authRepository = get()) }
     single { LinkKakaoAccountUseCase(authRepository = get()) }
+    single { CompleteAppleNicknameUseCase(authRepository = get()) }
+    single { LinkAppleAccountUseCase(authRepository = get()) }
     single { RequestPasswordResetUseCase(authRepository = get()) }
     single { ConfirmPasswordResetUseCase(authRepository = get()) }
     single { GetCurrentUserUseCase(authenticatedCallRunner = get(), authRepository = get()) }
@@ -66,11 +72,14 @@ internal val authModule = module {
             checkEmailAvailabilityUseCase = get(),
             loginUseCase = get(),
             kakaoLoginUseCase = get(),
+            appleLoginUseCase = get(),
             signupUseCase = get(),
             resendEmailVerificationUseCase = get(),
             confirmEmailVerificationUseCase = get(),
             completeKakaoNicknameUseCase = get(),
             linkKakaoAccountUseCase = get(),
+            completeAppleNicknameUseCase = get(),
+            linkAppleAccountUseCase = get(),
             requestPasswordResetUseCase = get(),
             confirmPasswordResetUseCase = get(),
             getCurrentUserUseCase = get(),

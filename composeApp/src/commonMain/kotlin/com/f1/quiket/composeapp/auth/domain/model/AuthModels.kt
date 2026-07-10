@@ -44,6 +44,24 @@ internal sealed interface KakaoLoginResult {
     ) : KakaoLoginResult
 }
 
+internal sealed interface AppleLoginResult {
+    data class LoggedIn(
+        val tokenData: AuthTokenData,
+    ) : AppleLoginResult
+
+    data class NicknameRequired(
+        val data: AppleNicknameRequired,
+    ) : AppleLoginResult
+
+    data class AccountLinkRequired(
+        val data: AppleAccountLinkRequired,
+    ) : AppleLoginResult
+
+    data class Failure(
+        val message: String,
+    ) : AppleLoginResult
+}
+
 @Serializable
 internal data class KakaoAccountLinkRequired(
     val email: String,
@@ -54,6 +72,21 @@ internal data class KakaoAccountLinkRequired(
 
 @Serializable
 internal data class KakaoNicknameRequired(
+    val signupToken: String,
+    val provider: String,
+    val suggestedNickname: String? = null,
+)
+
+@Serializable
+internal data class AppleAccountLinkRequired(
+    val email: String,
+    val provider: String,
+    val linkToken: String,
+    val expiresInSeconds: Long,
+)
+
+@Serializable
+internal data class AppleNicknameRequired(
     val signupToken: String,
     val provider: String,
     val suggestedNickname: String? = null,

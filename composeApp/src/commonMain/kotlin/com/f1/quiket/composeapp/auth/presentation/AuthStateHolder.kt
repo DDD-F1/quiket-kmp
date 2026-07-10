@@ -2,6 +2,7 @@ package com.f1.quiket.composeapp.auth.presentation
 
 import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.domain.model.AuthUser
+import com.f1.quiket.composeapp.auth.domain.model.AppleLoginResult
 import com.f1.quiket.composeapp.auth.domain.model.KakaoLoginResult
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.auth.domain.model.EmailAvailability
@@ -9,15 +10,18 @@ import com.f1.quiket.composeapp.auth.domain.model.EmailVerificationSent
 import com.f1.quiket.composeapp.auth.domain.model.PasswordResetRequested
 import com.f1.quiket.composeapp.auth.domain.model.SignupData
 import com.f1.quiket.composeapp.auth.domain.usecase.CheckEmailAvailabilityUseCase
+import com.f1.quiket.composeapp.auth.domain.usecase.AppleLoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ClearAuthUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.CompletedLogin
 import com.f1.quiket.composeapp.auth.domain.usecase.CompleteLoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.CompleteKakaoNicknameUseCase
+import com.f1.quiket.composeapp.auth.domain.usecase.CompleteAppleNicknameUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ConfirmEmailVerificationUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ConfirmPasswordResetUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.GetCurrentUserUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.KakaoLoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.LinkKakaoAccountUseCase
+import com.f1.quiket.composeapp.auth.domain.usecase.LinkAppleAccountUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.LoginUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.LogoutUseCase
 import com.f1.quiket.composeapp.auth.domain.usecase.ReadSessionUseCase
@@ -34,11 +38,14 @@ internal class AuthStateHolder(
     private val checkEmailAvailabilityUseCase: CheckEmailAvailabilityUseCase,
     private val loginUseCase: LoginUseCase,
     private val kakaoLoginUseCase: KakaoLoginUseCase,
+    private val appleLoginUseCase: AppleLoginUseCase,
     private val signupUseCase: SignupUseCase,
     private val resendEmailVerificationUseCase: ResendEmailVerificationUseCase,
     private val confirmEmailVerificationUseCase: ConfirmEmailVerificationUseCase,
     private val completeKakaoNicknameUseCase: CompleteKakaoNicknameUseCase,
     private val linkKakaoAccountUseCase: LinkKakaoAccountUseCase,
+    private val completeAppleNicknameUseCase: CompleteAppleNicknameUseCase,
+    private val linkAppleAccountUseCase: LinkAppleAccountUseCase,
     private val requestPasswordResetUseCase: RequestPasswordResetUseCase,
     private val confirmPasswordResetUseCase: ConfirmPasswordResetUseCase,
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
@@ -73,6 +80,16 @@ internal class AuthStateHolder(
     suspend fun kakaoLogin(kakaoAccessToken: String): KakaoLoginResult =
         kakaoLoginUseCase(kakaoAccessToken = kakaoAccessToken)
 
+    suspend fun appleLogin(
+        identityToken: String,
+        authorizationCode: String?,
+        fullName: String?,
+    ): AppleLoginResult = appleLoginUseCase(
+        identityToken = identityToken,
+        authorizationCode = authorizationCode,
+        fullName = fullName,
+    )
+
     suspend fun signup(
         email: String,
         password: String,
@@ -102,6 +119,19 @@ internal class AuthStateHolder(
 
     suspend fun linkKakaoAccount(linkToken: String, email: String, password: String): AuthTokenData =
         linkKakaoAccountUseCase(
+            linkToken = linkToken,
+            email = email,
+            password = password,
+        )
+
+    suspend fun completeAppleNickname(signupToken: String, nickname: String): AuthTokenData =
+        completeAppleNicknameUseCase(
+            signupToken = signupToken,
+            nickname = nickname,
+        )
+
+    suspend fun linkAppleAccount(linkToken: String, email: String, password: String): AuthTokenData =
+        linkAppleAccountUseCase(
             linkToken = linkToken,
             email = email,
             password = password,

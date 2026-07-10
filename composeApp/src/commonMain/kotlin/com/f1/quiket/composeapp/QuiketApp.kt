@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.f1.quiket.composeapp.auth.domain.model.AppleLoginResult
 import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.domain.model.AuthException
 import com.f1.quiket.composeapp.auth.domain.model.KakaoLoginResult
@@ -41,10 +42,10 @@ import com.f1.quiket.composeapp.designsystem.QuiketBrown50
 import com.f1.quiket.composeapp.designsystem.QuiketGray700
 import com.f1.quiket.composeapp.designsystem.QuiketTheme
 import com.f1.quiket.composeapp.login.PasswordResetDraft
-import com.f1.quiket.composeapp.login.KakaoAuthDraft
+import com.f1.quiket.composeapp.login.OAuthAuthDraft
 import com.f1.quiket.composeapp.login.SignupDraft
-import com.f1.quiket.composeapp.login.KakaoAccountLinkRoute
-import com.f1.quiket.composeapp.login.KakaoNicknameRoute
+import com.f1.quiket.composeapp.login.OAuthAccountLinkRoute
+import com.f1.quiket.composeapp.login.OAuthNicknameRoute
 import com.f1.quiket.composeapp.login.LoginEmailScreen
 import com.f1.quiket.composeapp.login.LoginScreen
 import com.f1.quiket.composeapp.login.PasswordResetEmailVerificationRoute
@@ -54,7 +55,7 @@ import com.f1.quiket.composeapp.login.SignUpCredentialsRoute
 import com.f1.quiket.composeapp.login.SignUpNicknameRoute
 import com.f1.quiket.composeapp.login.SignUpTermsRoute
 import com.f1.quiket.composeapp.login.SignUpTermsState
-import com.f1.quiket.composeapp.login.toDraft
+import com.f1.quiket.composeapp.login.toOAuthDraft
 import com.f1.quiket.composeapp.main.MainScreen
 import com.f1.quiket.composeapp.network.toUserFacingMessage
 import com.f1.quiket.composeapp.onboarding.OnboardingScreen
@@ -76,6 +77,13 @@ import kotlin.time.TimeSource
 
 typealias KakaoLoginCompletion = (accessToken: String?, errorMessage: String?) -> Unit
 typealias KakaoLoginLauncher = (KakaoLoginCompletion) -> Unit
+typealias AppleLoginCompletion = (
+    identityToken: String?,
+    authorizationCode: String?,
+    fullName: String?,
+    errorMessage: String?,
+) -> Unit
+typealias AppleLoginLauncher = (AppleLoginCompletion) -> Unit
 
 private const val SplashAnimationDurationMillis = 5_050L
 
@@ -84,14 +92,20 @@ fun QuiketApp(
     kakaoLoginLauncher: KakaoLoginLauncher = { completion ->
         completion(null, "카카오 로그인을 사용할 수 없습니다.")
     },
+    appleLoginLauncher: AppleLoginLauncher = { completion ->
+        completion(null, null, null, "Apple 로그인을 사용할 수 없습니다.")
+    },
+    isAppleLoginAvailable: Boolean = false,
 ) {
     var route by remember { mutableStateOf(Route.Loading) }
     var loggedInNickname by remember { mutableStateOf<String?>(null) }
     var signupDraft by remember { mutableStateOf(SignupDraft()) }
     var signUpCodeBackRoute by remember { mutableStateOf(Route.SignUpTerms) }
-    var kakaoAuthDraft by remember { mutableStateOf(KakaoAuthDraft()) }
+    var oauthAuthDraft by remember { mutableStateOf(OAuthAuthDraft()) }
     var isKakaoLoading by remember { mutableStateOf(false) }
     var kakaoErrorMessage by remember { mutableStateOf<String?>(null) }
+    var isAppleLoading by remember { mutableStateOf(false) }
+    var appleErrorMessage by remember { mutableStateOf<String?>(null) }
     var passwordResetDraft by remember { mutableStateOf(PasswordResetDraft()) }
     var isSignupSubmitting by remember { mutableStateOf(false) }
     var signupSubmitErrorMessage by remember { mutableStateOf<String?>(null) }
@@ -144,8 +158,9 @@ fun QuiketApp(
         loggedInNickname = completedLogin.nickname
         signupDraft = SignupDraft()
         signUpCodeBackRoute = Route.SignUpTerms
-        kakaoAuthDraft = KakaoAuthDraft()
+        oauthAuthDraft = OAuthAuthDraft()
         kakaoErrorMessage = null
+        appleErrorMessage = null
         route = Route.Main
     }
 
@@ -156,13 +171,13 @@ fun QuiketApp(
             }
 
             is KakaoLoginResult.NicknameRequired -> {
-                kakaoAuthDraft = result.data.toDraft()
+                oauthAuthDraft = result.data.toOAuthDraft()
                 kakaoErrorMessage = null
                 route = Route.KakaoNickname
             }
 
             is KakaoLoginResult.AccountLinkRequired -> {
-                kakaoAuthDraft = result.data.toDraft()
+                oauthAuthDraft = result.data.toOAuthDraft()
                 kakaoErrorMessage = null
                 route = Route.KakaoAccountLink
             }
@@ -178,6 +193,7 @@ fun QuiketApp(
 
         isKakaoLoading = true
         kakaoErrorMessage = null
+        appleErrorMessage = null
         runCatching {
             kakaoLoginLauncher { accessToken, errorMessage ->
                 coroutineScope.launch {
@@ -196,6 +212,71 @@ fun QuiketApp(
         }.onFailure { error ->
             kakaoErrorMessage = error.toUserFacingMessage("카카오 로그인에 실패했습니다.")
             isKakaoLoading = false
+        }
+    }
+
+    suspend fun handleServerAppleLogin(
+        identityToken: String,
+        authorizationCode: String?,
+        fullName: String?,
+    ) {
+        when (
+            val result = authStateHolder.appleLogin(
+                identityToken = identityToken,
+                authorizationCode = authorizationCode,
+                fullName = fullName,
+            )
+        ) {
+            is AppleLoginResult.LoggedIn -> {
+                completeLogin(result.tokenData)
+            }
+
+            is AppleLoginResult.NicknameRequired -> {
+                oauthAuthDraft = result.data.toOAuthDraft()
+                appleErrorMessage = null
+                route = Route.AppleNickname
+            }
+
+            is AppleLoginResult.AccountLinkRequired -> {
+                oauthAuthDraft = result.data.toOAuthDraft()
+                appleErrorMessage = null
+                route = Route.AppleAccountLink
+            }
+
+            is AppleLoginResult.Failure -> {
+                appleErrorMessage = result.message
+            }
+        }
+    }
+
+    fun requestAppleLogin() {
+        if (!isAppleLoginAvailable || isAppleLoading) return
+
+        isAppleLoading = true
+        appleErrorMessage = null
+        kakaoErrorMessage = null
+        runCatching {
+            appleLoginLauncher { identityToken, authorizationCode, fullName, errorMessage ->
+                coroutineScope.launch {
+                    if (!identityToken.isNullOrBlank()) {
+                        runCatching {
+                            handleServerAppleLogin(
+                                identityToken = identityToken,
+                                authorizationCode = authorizationCode?.takeIf { it.isNotBlank() },
+                                fullName = fullName?.takeIf { it.isNotBlank() },
+                            )
+                        }.onFailure { error ->
+                            appleErrorMessage = error.toUserFacingMessage("Apple 로그인에 실패했습니다.")
+                        }
+                    } else {
+                        appleErrorMessage = errorMessage ?: "Apple 로그인에 실패했습니다."
+                    }
+                    isAppleLoading = false
+                }
+            }
+        }.onFailure { error ->
+            appleErrorMessage = error.toUserFacingMessage("Apple 로그인에 실패했습니다.")
+            isAppleLoading = false
         }
     }
 
@@ -227,6 +308,7 @@ fun QuiketApp(
                     onBackClick = { route = Route.Onboarding },
                     onQuiketLoginClick = { route = Route.EmailLogin },
                     onKakaoLoginClick = { requestKakaoLogin() },
+                    onAppleLoginClick = { requestAppleLogin() },
                     onSignUpClick = {
                         signupSubmitErrorMessage = null
                         signUpCodeBackRoute = Route.SignUpTerms
@@ -234,6 +316,9 @@ fun QuiketApp(
                     },
                     isKakaoLoading = isKakaoLoading,
                     kakaoErrorMessage = kakaoErrorMessage,
+                    isAppleLoginVisible = isAppleLoginAvailable,
+                    isAppleLoading = isAppleLoading,
+                    appleErrorMessage = appleErrorMessage,
                 )
             }
 
@@ -349,25 +434,28 @@ fun QuiketApp(
             }
 
             Route.KakaoNickname -> {
-                KakaoNicknameRoute(
-                    draft = kakaoAuthDraft,
+                OAuthNicknameRoute(
+                    draft = oauthAuthDraft,
+                    providerName = "카카오",
                     onBackClick = {
-                        kakaoAuthDraft = KakaoAuthDraft()
+                        oauthAuthDraft = OAuthAuthDraft()
                         route = Route.Login
                     },
                     onComplete = { tokenData ->
                         coroutineScope.launch {
-                            completeLogin(tokenData, fallbackNickname = kakaoAuthDraft.suggestedNickname ?: "사용자")
+                            completeLogin(tokenData, fallbackNickname = oauthAuthDraft.suggestedNickname ?: "사용자")
                         }
                     },
+                    onCompleteNickname = authStateHolder::completeKakaoNickname,
                 )
             }
 
             Route.KakaoAccountLink -> {
-                KakaoAccountLinkRoute(
-                    draft = kakaoAuthDraft,
+                OAuthAccountLinkRoute(
+                    draft = oauthAuthDraft,
+                    providerName = "카카오",
                     onBackClick = {
-                        kakaoAuthDraft = KakaoAuthDraft()
+                        oauthAuthDraft = OAuthAuthDraft()
                         route = Route.Login
                     },
                     onComplete = { tokenData ->
@@ -375,6 +463,41 @@ fun QuiketApp(
                             completeLogin(tokenData)
                         }
                     },
+                    onLinkAccount = authStateHolder::linkKakaoAccount,
+                )
+            }
+
+            Route.AppleNickname -> {
+                OAuthNicknameRoute(
+                    draft = oauthAuthDraft,
+                    providerName = "Apple",
+                    onBackClick = {
+                        oauthAuthDraft = OAuthAuthDraft()
+                        route = Route.Login
+                    },
+                    onComplete = { tokenData ->
+                        coroutineScope.launch {
+                            completeLogin(tokenData, fallbackNickname = oauthAuthDraft.suggestedNickname ?: "사용자")
+                        }
+                    },
+                    onCompleteNickname = authStateHolder::completeAppleNickname,
+                )
+            }
+
+            Route.AppleAccountLink -> {
+                OAuthAccountLinkRoute(
+                    draft = oauthAuthDraft,
+                    providerName = "Apple",
+                    onBackClick = {
+                        oauthAuthDraft = OAuthAuthDraft()
+                        route = Route.Login
+                    },
+                    onComplete = { tokenData ->
+                        coroutineScope.launch {
+                            completeLogin(tokenData)
+                        }
+                    },
+                    onLinkAccount = authStateHolder::linkAppleAccount,
                 )
             }
 
@@ -463,8 +586,9 @@ fun QuiketApp(
                         coroutineScope.launch {
                             authStateHolder.logout()
                             loggedInNickname = null
-                            kakaoAuthDraft = KakaoAuthDraft()
+                            oauthAuthDraft = OAuthAuthDraft()
                             kakaoErrorMessage = null
+                            appleErrorMessage = null
                             route = Route.Login
                         }
                     },
@@ -493,6 +617,8 @@ private enum class Route {
     PasswordResetNewPassword,
     KakaoNickname,
     KakaoAccountLink,
+    AppleNickname,
+    AppleAccountLink,
     SignUpCredentials,
     SignUpNickname,
     SignUpTerms,

@@ -2,6 +2,7 @@ package com.f1.quiket.composeapp
 
 import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.domain.model.AuthUser
+import com.f1.quiket.composeapp.auth.domain.model.AppleLoginResult
 import com.f1.quiket.composeapp.auth.domain.model.KakaoLoginResult
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.auth.domain.model.EmailAvailability
@@ -112,8 +113,15 @@ internal class FakeAuthRepository : AuthRepository {
     override suspend fun confirmEmailVerification(email: String, verificationCode: String): AuthTokenData = unsupported()
     override suspend fun login(email: String, password: String): AuthTokenData = unsupported()
     override suspend fun kakaoLogin(kakaoAccessToken: String): KakaoLoginResult = unsupported()
+    override suspend fun appleLogin(
+        identityToken: String,
+        authorizationCode: String?,
+        fullName: String?,
+    ): AppleLoginResult = unsupported()
     override suspend fun completeKakaoNickname(signupToken: String, nickname: String): AuthTokenData = unsupported()
     override suspend fun linkKakaoAccount(linkToken: String, email: String, password: String): AuthTokenData = unsupported()
+    override suspend fun completeAppleNickname(signupToken: String, nickname: String): AuthTokenData = unsupported()
+    override suspend fun linkAppleAccount(linkToken: String, email: String, password: String): AuthTokenData = unsupported()
     override suspend fun logout(session: SessionSnapshot) = Unit
     override suspend fun getMe(session: SessionSnapshot): AuthUser = unsupported()
     override suspend fun requestPasswordReset(email: String): PasswordResetRequested = unsupported()

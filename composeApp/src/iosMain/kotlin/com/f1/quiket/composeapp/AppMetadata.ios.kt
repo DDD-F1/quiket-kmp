@@ -12,7 +12,7 @@ internal actual object AppMetadata {
         get() = bundleString("CFBundleShortVersionString") ?: "1.4"
 
     actual val buildNumber: String
-        get() = bundleString("CFBundleVersion") ?: "5"
+        get() = bundleString("CFBundleVersion") ?: "7"
 
     private fun bundleString(key: String): String? =
         (NSBundle.mainBundle.objectForInfoDictionaryKey(key) as? String)

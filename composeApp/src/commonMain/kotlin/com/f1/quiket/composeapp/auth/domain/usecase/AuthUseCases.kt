@@ -2,6 +2,7 @@ package com.f1.quiket.composeapp.auth.domain.usecase
 
 import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.domain.model.AuthUser
+import com.f1.quiket.composeapp.auth.domain.model.AppleLoginResult
 import com.f1.quiket.composeapp.auth.domain.model.KakaoLoginResult
 import com.f1.quiket.composeapp.auth.SessionSnapshot
 import com.f1.quiket.composeapp.auth.domain.model.EmailAvailability
@@ -84,6 +85,20 @@ internal class KakaoLoginUseCase(
         authRepository.kakaoLogin(kakaoAccessToken = kakaoAccessToken)
 }
 
+internal class AppleLoginUseCase(
+    private val authRepository: AuthRepository,
+) {
+    suspend operator fun invoke(
+        identityToken: String,
+        authorizationCode: String?,
+        fullName: String?,
+    ): AppleLoginResult = authRepository.appleLogin(
+        identityToken = identityToken,
+        authorizationCode = authorizationCode,
+        fullName = fullName,
+    )
+}
+
 internal class SignupUseCase(
     private val authRepository: AuthRepository,
 ) {
@@ -132,6 +147,27 @@ internal class LinkKakaoAccountUseCase(
 ) {
     suspend operator fun invoke(linkToken: String, email: String, password: String): AuthTokenData =
         authRepository.linkKakaoAccount(
+            linkToken = linkToken,
+            email = email,
+            password = password,
+        )
+}
+
+internal class CompleteAppleNicknameUseCase(
+    private val authRepository: AuthRepository,
+) {
+    suspend operator fun invoke(signupToken: String, nickname: String): AuthTokenData =
+        authRepository.completeAppleNickname(
+            signupToken = signupToken,
+            nickname = nickname,
+        )
+}
+
+internal class LinkAppleAccountUseCase(
+    private val authRepository: AuthRepository,
+) {
+    suspend operator fun invoke(linkToken: String, email: String, password: String): AuthTokenData =
+        authRepository.linkAppleAccount(
             linkToken = linkToken,
             email = email,
             password = password,
