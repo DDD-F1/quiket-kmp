@@ -9,10 +9,10 @@ internal actual object AppMetadata {
             ?: "Quiket"
 
     actual val versionName: String
-        get() = bundleString("CFBundleShortVersionString") ?: "1.4"
+        get() = bundleString("CFBundleShortVersionString") ?: "1.5"
 
     actual val buildNumber: String
-        get() = bundleString("CFBundleVersion") ?: "7"
+        get() = bundleString("CFBundleVersion") ?: "1"
 
     private fun bundleString(key: String): String? =
         (NSBundle.mainBundle.objectForInfoDictionaryKey(key) as? String)

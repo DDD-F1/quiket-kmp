@@ -17,7 +17,7 @@ Quiket API version: `1.1.0`
 
 | Provider | Endpoints | App status |
 | --- | --- | --- |
-| Kakao | `POST /auth/oauth/kakao/login`, `/link`, `/nickname` | Implemented. iOS SDK bridge and shared account-link/nickname routes exist. |
+| Kakao | `POST /auth/oauth/kakao/login`, `/link`, `/nickname` | Implemented. Android and iOS SDK bridges plus shared account-link/nickname routes exist. Android debug OAuth entry/cancel-return and release OAuth entry smoke tests passed; real-account and backend-branch QA remain. |
 | Apple | `POST /auth/oauth/apple/login`, `/link`, `/nickname` | iOS client, system authorization bridge, UI, and shared nickname/account-link routes are implemented. Real-device and backend-flow QA remain. |
 
 ## Apple Login

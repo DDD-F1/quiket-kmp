@@ -95,6 +95,7 @@ fun QuiketApp(
     appleLoginLauncher: AppleLoginLauncher = { completion ->
         completion(null, null, null, "Apple 로그인을 사용할 수 없습니다.")
     },
+    isEmailLoginAvailable: Boolean = false,
     isAppleLoginAvailable: Boolean = false,
 ) {
     var route by remember { mutableStateOf(Route.Loading) }
@@ -316,6 +317,8 @@ fun QuiketApp(
                     },
                     isKakaoLoading = isKakaoLoading,
                     kakaoErrorMessage = kakaoErrorMessage,
+                    isQuiketLoginVisible = isEmailLoginAvailable,
+                    isSignUpVisible = false,
                     isAppleLoginVisible = isAppleLoginAvailable,
                     isAppleLoading = isAppleLoading,
                     appleErrorMessage = appleErrorMessage,

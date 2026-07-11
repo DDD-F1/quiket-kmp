@@ -38,6 +38,7 @@ Use Android `dev` only as the visual and behavioral QA reference. Compose Multip
 - Quiz create request policy is moved behind `BuildQuizCreateRequestUseCase`.
 - Review tab remains a placeholder and intentionally has no API dependency until the feature UI is implemented.
 - Backend OpenAPI `3.0.3` / Quiket API `1.1.0` snapshot is tracked in `docs/openapi.yaml`; the app-facing OAuth contract is summarized in `docs/api-contract.md`.
+- Kakao Android SDK initialization, OAuth callback activity, browser-account fallback, and shared server login flow are implemented. Release uses `com.f1.quiket`; debug uses `com.f1.quiket.composeapp` for side-by-side QA.
 - Apple OAuth KMP client, iOS Sign in with Apple bridge, Apple UI, and shared nickname/account-link routes are implemented. Real-device and backend-flow QA remain.
 
 ## QA Parity Baseline
@@ -51,7 +52,7 @@ Detailed evidence lives in `docs/kmp-migration-parity.md`. High-level QA parity 
 - Material check and lecture view: Android parity work complete
 - Quiz create/start/play/result/review detail: major parity issues addressed
 - Session refresh: Compose Multiplatform refresh serialization added
-- API spec changes: OpenAPI `1.1.0` snapshot synchronized; Apple OAuth client implementation added
+- API spec changes: OpenAPI `1.1.0` snapshot synchronized; Android Kakao SDK and Apple OAuth client implementations added
 
 ## Runtime Verification Requirements
 

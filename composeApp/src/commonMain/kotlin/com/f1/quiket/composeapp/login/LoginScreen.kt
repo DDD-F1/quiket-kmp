@@ -57,6 +57,8 @@ fun LoginScreen(
     modifier: Modifier = Modifier,
     isKakaoLoading: Boolean = false,
     kakaoErrorMessage: String? = null,
+    isQuiketLoginVisible: Boolean = false,
+    isSignUpVisible: Boolean = false,
     isAppleLoginVisible: Boolean = false,
     isAppleLoading: Boolean = false,
     appleErrorMessage: String? = null,
@@ -78,7 +80,11 @@ fun LoginScreen(
                 .align(Alignment.TopCenter)
                 .padding(horizontal = 16.dp)
                 .padding(top = 144.dp)
-                .height(if (isAppleLoginVisible) 634.dp else 558.dp),
+                .height(
+                    558.dp +
+                        if (isQuiketLoginVisible) 68.dp else 0.dp +
+                        if (isAppleLoginVisible) 76.dp else 0.dp,
+                ),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(36.dp),
         ) {
@@ -91,6 +97,8 @@ fun LoginScreen(
                 onSignUpClick = onSignUpClick,
                 isKakaoLoading = isKakaoLoading,
                 kakaoErrorMessage = kakaoErrorMessage,
+                isQuiketLoginVisible = isQuiketLoginVisible,
+                isSignUpVisible = isSignUpVisible,
                 isAppleLoginVisible = isAppleLoginVisible,
                 isAppleLoading = isAppleLoading,
                 appleErrorMessage = appleErrorMessage,
@@ -192,6 +200,8 @@ private fun LoginActionArea(
     modifier: Modifier = Modifier,
     isKakaoLoading: Boolean = false,
     kakaoErrorMessage: String? = null,
+    isQuiketLoginVisible: Boolean = false,
+    isSignUpVisible: Boolean = false,
     isAppleLoginVisible: Boolean = false,
     isAppleLoading: Boolean = false,
     appleErrorMessage: String? = null,
@@ -201,16 +211,20 @@ private fun LoginActionArea(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .height(if (isAppleLoginVisible) 252.dp else 176.dp),
+            .height(
+                176.dp +
+                    if (isQuiketLoginVisible) 68.dp else 0.dp +
+                    if (isAppleLoginVisible) 76.dp else 0.dp,
+            ),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        /*
-        QuiketPrimaryButton(
-            text = "Quiket 로그인",
-            onClick = onQuiketLoginClick,
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        */
+        if (isQuiketLoginVisible) {
+            QuiketPrimaryButton(
+                text = "Quiket 로그인",
+                onClick = onQuiketLoginClick,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
         KakaoLoginButton(
             isLoading = isKakaoLoading,
             onClick = onKakaoLoginClick,
@@ -232,8 +246,10 @@ private fun LoginActionArea(
                 modifier = Modifier.fillMaxWidth(),
             )
         }
-        Spacer(modifier = Modifier.height(if (socialErrorMessage.isNullOrBlank()) 20.dp else 8.dp))
-        SignUpText(onClick = onSignUpClick)
+        if (isSignUpVisible) {
+            Spacer(modifier = Modifier.height(if (socialErrorMessage.isNullOrBlank()) 20.dp else 8.dp))
+            SignUpText(onClick = onSignUpClick)
+        }
     }
 }
 

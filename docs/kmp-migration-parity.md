@@ -202,7 +202,7 @@
 | 이메일 로그인 | `feature:login` | `AuthClient`, `LoginEmailScreen` | 실패 횟수/잠금/미인증 이메일 분기까지 CMP에 대응됨. 테스트 계정 Android `/auth/login` 200과 후속 `/home`, `/subjects` 200 확인 이력이 있고, iOS CMP도 저장 세션으로 홈 API 200 및 인증 후 주요 탭 스모크를 통과했다. |
 | 회원가입 제출/이메일 인증 | 이메일/비밀번호 입력 -> 닉네임 -> 약관 -> `auth/signup` -> 인증번호 확인 | 이메일/비밀번호 입력 -> 닉네임 -> 약관 -> `auth/signup` -> 인증번호 확인 | 이메일 중복 확인, 약관 제출 시 가입 요청, 인증번호 재전송/확인, 확인 성공 후 토큰 저장 흐름 대응 |
 | 비밀번호 재설정 | Android reset email/code/new password | `PasswordResetEmailVerificationRoute`, `PasswordResetNewPasswordRoute` | CMP 화면/API 대응 확인 |
-| 카카오 로그인 | Android Kakao SDK | iOS Kakao SDK bridge + `OAuthAuthScreens` | 닉네임 필요/계정 연결 필요 분기 대응. iOS Info.plist/Swift bridge 포함 |
+| 카카오 로그인 | Android Kakao SDK | Android/iOS Kakao SDK bridge + `OAuthAuthScreens` | 닉네임 필요/계정 연결 필요 분기 대응. Android callback activity/browser fallback과 iOS Info.plist/Swift bridge 포함 |
 | Apple 로그인 | Android parity 기준 없음 | iOS Sign in with Apple bridge + 공유 OAuth auth 흐름 | 백엔드 OpenAPI `1.1.0`의 `/auth/oauth/apple/login`, `/link`, `/nickname` 계약을 구현했다. iOS 로그인 화면은 카카오 아래에 Apple 버튼을 노출한다. 실제 Apple 계정으로 첫 승인/재로그인/닉네임/계정 연동 QA가 필요하다. |
 | 회원가입 약관 상세 | Android native 약관 화면 | CMP native 약관 화면 | 약관 본문, 필수/선택 동의 대응. CMP 상세도 Android처럼 raw 첫 줄을 제목으로 분리하고 나머지를 본문 섹션으로 표시하도록 보정. Android/iOS 서비스 약관 상세 실기 확인 완료 |
 | 회원가입 약관 동의 조건 | 서비스 이용 약관/개인정보 필수, 마케팅 선택 | 서비스 이용 약관/개인정보 필수, 마케팅 선택 | 필수 동의 조건과 전체 동의 동작 대응. 서비스 약관 24,099자, 개인정보 20,628자 원문 diff 동일 |
