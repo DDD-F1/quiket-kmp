@@ -30,14 +30,16 @@ Use this before creating or changing Jetpack Compose or Compose Multiplatform sc
 - Prefer Koin `factory` for screen-level StateHolders.
 - Use Koin `single` only for app-wide coordinators such as session/auth state.
 - Do not introduce Android ViewModel, SavedStateHandle, or lifecycle dependencies in `commonMain`.
+- Suspending StateHolder operations must preserve structured concurrency. Use `runSuspendCatching` for result conversion so `CancellationException` is rethrown instead of becoming UI failure state.
 
 ## Compose Multiplatform Screen Rules
 
-- Put shared screen UI in `composeApp/src/commonMain`.
+- Put shared screen UI in the owning `app-shell` or `feature/*` module's `src/commonMain`.
+- Keep `composeApp` focused on platform entry points, SDK bridges, manifests, and Koin startup; it is not the default owner of product screens.
 - Keep platform APIs behind callbacks, expect/actual, or platform services.
 - Treat safe area, navigation bar, keyboard, modal, file picker, and browser behavior as platform-sensitive.
 - Verify iOS layout for top safe area, bottom tab area, text wrapping, and button hit areas.
-- Use `composeResources` for shared Compose Multiplatform images, fonts, and animation JSON.
+- Put feature resources in the owning feature, app-shell resources in `app-shell`, and truly shared theme/component resources in `core:designsystem`.
 
 ## QA Parity
 
@@ -56,9 +58,35 @@ Use this before creating or changing Jetpack Compose or Compose Multiplatform sc
 ## UI Implementation
 
 - Prefer existing design system colors, typography, spacing, and components.
-- Put Compose Multiplatform shared brand resources in `composeApp/src/commonMain/composeResources`.
+- Put Compose Multiplatform resources in the owning module's `src/commonMain/composeResources`.
 - Keep previews/screens easy to render without Android framework objects.
 - Use clear callback names such as `onBackClick`, `onPrimaryClick`, `onComplete`, and `onSkip`.
+
+## Responsive Layout And Accessibility
+
+- Avoid fixed full-screen heights and large fixed top padding for login, form, and action-heavy screens. Prefer content-driven sizing, safe-area handling, and scrolling where content can grow.
+- Verify small phones, large text, long Korean strings, keyboard-open state, and both Android/iOS safe areas.
+- Give text fields a persistent accessible label after input and associate validation errors with the field semantics.
+- Use `selectable`/`toggleable` or explicit `selected`/`checked` semantics for custom selection controls.
+- Use `Dialog`, `ModalBottomSheet`, or equivalent modal semantics when background content must not remain accessible.
+- Keep interactive targets at least 48dp on Android-oriented shared UI and at least 44pt for iOS usability.
+- Check stateful foreground/background color pairs for readable contrast; a design token is not automatically valid in every state.
+
+## Navigation And Restoration
+
+- Root and cross-feature navigation belongs to `app-shell` and uses KMP Navigation 3. Feature screens expose navigation callbacks and do not manipulate the app back stack directly.
+- Model destinations as serializable `NavKey` values with minimal stable arguments; do not pass secrets, full domain objects, or platform handles.
+- State required after process recreation, app relaunch, or return from a platform flow must not live only in plain `remember`.
+- Use a serializable route model for saveable back-stack restoration and a separate persistent owner for business drafts that must survive a fresh app launch.
+- Sensitive signup and OAuth credentials are not navigation state and must reset to a safe authentication entry point instead of being persisted in routes.
+- Navigation, snackbar, and other one-off effects must be separated from durable state and must not replay after restoration.
+
+## File Size And Decomposition
+
+- A Gradle module is not a substitute for screen-level decomposition.
+- Split large screens by state owner, route, major section, reusable component, and dialog/overlay when the file becomes difficult to review or test.
+- Keep business decisions in StateHolder/use cases; extracting a visual component must not create a second source of state truth.
+- Keep the route entry file focused on dependency/state/navigation wiring. Section and component files may use module-internal APIs but should not widen public feature contracts.
 
 ## Practical Rule
 

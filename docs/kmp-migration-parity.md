@@ -2,6 +2,8 @@
 
 작성일: 2026-06-30
 
+상태: 과거 Android/CMP 대조 QA 증적. 현재 구조와 릴리즈 상태의 기준 문서는 `docs/kmp-current-status.md`이며, 현재 검증 명령은 `docs/validation.md`를 따른다. 아래의 로컬 경로, simulator 이름, `/tmp` 산출물 경로는 당시 실행 기록이므로 다른 환경의 설정값으로 사용하지 않는다.
+
 ## 목적
 
 `dev` 브랜치의 기존 Android 앱을 기준으로 `current KMP branch`의 KMP/CMP iOS 앱이 어디까지 동일한 사용자 경험과 기능을 제공하는지 비교한다. 차이점을 먼저 문서화한 뒤, `current KMP branch`에서 누락 기능과 동작 차이를 줄이는 방식으로 진행한다.
@@ -10,10 +12,10 @@
 
 | 항목 | Android 원본 | iOS CMP |
 | --- | --- | --- |
-| 작업 폴더 | `/Users/jm/StudioProjects/DDD-13-F1-Android-dev` | `/Users/jm/StudioProjects/DDD-13-F1-Android` |
+| 저장소 | 기존 Android QA reference | Quiket KMP repository |
 | 브랜치 | `dev` | `current KMP branch` |
 | 커밋 | `f3f69d4` | `c4208cb` |
-| 런타임 | Android emulator `emulator-5554`, AVD `Codex_Quiket_API_36` | iPhone 16 Pro simulator `A2A3FC10-2233-4627-BBA2-3BC5F57BD3C4` |
+| 런타임 | Android API 36 emulator | iOS Simulator |
 | 앱 ID | `com.f1.quiket` | `com.f1.quiket` |
 | 원격 상태 | `origin/dev` 추적 | `origin/current KMP branch` 추적 |
 
@@ -70,9 +72,9 @@
 | 영역 | Android 원본 상태 | iOS CMP 상태 | 판정 |
 | --- | --- | --- | --- |
 | 앱 시작 | 첫 실행 후 로그인 진입 화면 표시. `Quiket 로그인`, `카카오로 시작하기`, `회원가입` 표시 확인. 이후 테스트 계정 로그인 성공 | 기존 QA 세션으로 로그인된 홈 표시 | 양쪽 모두 인증 상태 확보 |
-| 이메일 로그인 | `ja2hoon97@gmail.com` 계정으로 `/auth/login` 200, 홈/과목 API 200 확인 | 기존 세션으로 홈 접근 및 홈 API 200 확인 | Android 인증 막힘 해소 |
+| 이메일 로그인 | QA 테스트 계정으로 `/auth/login` 200, 홈/과목 API 200 확인 | 기존 세션으로 홈 접근 및 홈 API 200 확인 | Android 인증 막힘 해소 |
 | 홈 | Android 기준 홈은 상단 `Quiket` 로고, 가이드북/알림 아이콘, 가이드 말풍선, `자료 업로드`/`퀴즈 풀기` 빠른 액션, 사용자 도토리 카드, D-Day pager, `내 과목`/`최근 활동` 탭 구조 | CMP도 `Quiket` 로고, 가이드북/알림 아이콘, 빠른 액션, 프로필/도토리, D-Day pager, `내 과목`/`최근 활동` 탭 구조로 수정. 홈 가이드 첫 노출 말풍선과 실제 홈 요소 좌표 기반 하이라이트/말풍선 튜토리얼도 보강 | 정보 구조, 상단 아이콘, 튜토리얼 안내 방식 parity 보강 완료. 픽셀 단위 디자인은 최종 디자인 QA 영역 |
-| 오답노트 | 인증 상태에서 `오답은 지금 공사 중이에요` placeholder 확인. 단, `feature:review`의 API/Repository/model 레이어는 이미 존재 | CMP도 Android와 동일한 `오답은 지금 공사 중이에요` placeholder로 정렬. `ReviewClient` API 표면은 유지 | 탭 노출 parity 완료. 상세 API 재노출 여부는 이후 제품 결정 |
+| 오답노트 | 인증 상태에서 `오답은 지금 공사 중이에요` placeholder 확인. API/Repository/model 레이어는 향후 기능 후보로 존재 | CMP도 Android와 동일한 `오답은 지금 공사 중이에요` placeholder로 정렬. 사용되지 않던 review client/model/DI graph는 제거 | 탭 노출 parity 완료. 실제 기능 착수 시 현재 OpenAPI 기준으로 계약을 다시 추가 |
 | 과목 상세 | Android는 과목 상세에서 챕터 카드 중심으로 표시하고, 챕터 클릭 시 파트 본문으로 진입 | CMP도 챕터 카드 중심으로 수정. 파트 목록을 과목 상세에 펼치지 않고, 챕터 클릭 시 첫 파트 본문으로 진입. 하단 `챕터 추가` 카드 표시 확인 | 노출 밀도 parity 보강 완료 |
 | 퀴즈 생성/풀이/결과 | 동일 계정/동일 퀴즈 기준 시작, 한 문제씩 풀이, 결과 상세, 기록 리스트 확인 | 동일 결과 상세에서 20%, 5문제 중 1문제 정답 표시 확인 | 결과 상세과 기록 리스트는 Android parity 확인. 퀴즈 생성 옵션/과목 선택 차이는 수정 완료 |
 | 자료 업로드 | 텍스트 업로드로 `업로드 시작 -> 자료 확인 -> 완료 -> 파트 본문` 확인 | 텍스트 업로드로 `업로드 시작 -> 처리 -> 자료 확인 -> 완료 -> 파트 본문` 확인. 이미지/PDF picker 선택과 버튼 활성, multipart 요청, 제한 검증 코드 확인. API 기준 PDF/이미지 OCR 업로드도 완료 및 quiz-scope 반영 확인 | 양쪽 모두 텍스트 실서버 플로우 통과. iOS 파일 선택 UI와 파일 업로드 서버 계약도 통과 |
@@ -185,7 +187,7 @@
 
 비밀번호 입력 길이 문제를 한 번 확인했다. 첫 시도는 비밀번호 필드가 13글자로 잡혔고, 이후 필드를 완전히 비운 뒤 12글자로 재입력했지만 서버는 동일하게 `AUTH_INVALID_CREDENTIALS`를 반환했다. 남은 시도 횟수 보호를 위해 추가 로그인 시도는 중단한다.
 
-이후 동일 계정으로 다시 확인했을 때, 비밀번호 필드를 완전히 비운 뒤 `ja2hoon.test`를 12글자로 입력하고 키보드를 내린 상태에서 로그인 버튼을 눌러 정상 로그인됐다.
+이후 동일 계정으로 다시 확인했을 때, 비밀번호 필드를 완전히 비운 뒤 QA 비밀번호를 다시 입력하고 키보드를 내린 상태에서 로그인 버튼을 눌러 정상 로그인됐다.
 
 | 항목 | 값 |
 | --- | --- |
@@ -223,7 +225,7 @@
 | 퀴즈 로딩 오류 메시지 | `timeout`/네트워크 오류를 사용자 문구로 변환 | `toUserFacingMessage`, `toQuizNetworkAwareMessage`로 네트워크 오류 문구 변환 | `timeout` 원문 노출 위험은 현재 CMP 코드상 낮음 |
 | 퀴즈 결과/다시 풀기 | Android QuizResult | `QuizResultScreen` | iOS 전체 다시 풀기 확인됨 |
 | 기록 | Android History | `HistoryClient`, main history tab | 양쪽 모두 `/home/recent-activities` 기반. 완료 퀴즈는 결과, 준비/진행 퀴즈는 시작 화면으로 이동 |
-| 오답노트 | Android Review placeholder, API/Repository/model 존재 | `ReviewClient`, `ReviewScreen` | `dev`와 CMP 모두 "오답은 지금 공사 중이에요" placeholder를 노출한다. CMP의 `/quiz-results/{resultId}/review?filter=...` client 표면은 남겨 둔다 |
+| 오답노트 | Android Review placeholder, API/Repository/model 존재 | `app-shell`의 `ReviewRoute` placeholder | `dev`와 CMP 모두 "오답은 지금 공사 중이에요" placeholder를 노출한다. 사용되지 않던 CMP review transport graph는 제거했다 |
 | 마이페이지/설정 | Android MyPage | `MyPageClient`, `MyPageSettingsScreen`, sub screens | 프로필/닉네임/이메일/비밀번호/탈퇴/알림/문의/약관/앱정보 API 및 화면 대응 확인 |
 
 ## 정적 분석 판정
@@ -242,7 +244,7 @@
 | 과목/자료 API | 대응됨 | Android `SubjectApi`, `LectureUploadApi`의 과목 CRUD, 시험 일정 추가/삭제, 자격증 목록, 챕터/파트 수정, 자료 업로드/status 엔드포인트가 CMP `SubjectClient`에도 대응된다. |
 | 업로드 파일 제한 | CMP 보강 유지 | Android `dev`는 PDF 50MB/이미지 15장 문구와 이미지 개수 제한은 있지만 실제 파일 크기 검증은 선택 단계에서 보이지 않는다. CMP는 PDF 50MB, 이미지 장당 15MB, 최대 15장 제한을 선택 직후 검증해 사용자 메시지를 표시한다. 사용자 보호 목적의 상위 호환 보강으로 유지한다. |
 | 기록 | 대응됨 | Android와 CMP 모두 `/home/recent-activities`를 사용한다. `QuizCompleted`, `QuizReady`, `QuizInProgress` 클릭 분기도 같은 목적지로 연결된다. |
-| 오답노트 | Android parity 완료 | Android `dev`는 placeholder 화면이고 API/Repository/model 레이어는 존재한다. CMP도 탭 화면은 placeholder로 맞추고, review client 표면은 이후 기능 재노출을 위해 유지한다. |
+| 오답노트 | Android parity 완료 | Android `dev`는 placeholder 화면이고 API/Repository/model 레이어는 존재한다. CMP 탭도 placeholder로 맞췄으며 미사용 review client 표면은 유지하지 않는다. |
 | 업로드 polling | 대응됨 | Android와 CMP 모두 연속 polling 실패 시 실패 화면으로 빠지고, 서버 `failed` 상태를 성공 처리하지 않는다. CMP는 최대 polling 횟수 초과 메시지도 별도로 제공한다. |
 | 자료 확인 polling | CMP 보강 유지 | Android `MaterialCheckViewModel`은 status를 1회 조회하고 실패를 별도 UI 상태로 노출하지 않는다. CMP는 완료 전 진입 가능성을 고려해 최대 60회 polling, 연속 3회 실패 처리, 서버 `failed` 상태 메시지, retry UI를 제공한다. Android보다 안전한 상위 호환 동작으로 유지한다. |
 | 자료 확인 편집 | 대응됨 | 양쪽 모두 업로드 완료 후 status에서 chapter/parts를 받아 챕터명과 파트명을 수정한다. CMP는 수정 성공 응답으로 즉시 로컬 상태를 갱신하고, 빈 이름/30자 초과 검증도 제공한다. |
@@ -250,7 +252,7 @@
 | 과목 유형 수정 | 대응됨 | Android는 과목 상세 메뉴에서 기존 AddSubject Step2/3 화면을 재사용해 `updateSubjectDetails`를 호출한다. CMP도 과목 상세 메뉴에서 `SubjectDetailsEditRoute`를 열고 같은 `subjects/{id}/details` API를 호출한 뒤 상세를 reload한다. |
 | 홈/시험/즐겨찾기 정렬 | 대응됨 | Android와 CMP 모두 즐겨찾기 과목을 먼저 정렬하고, D-Day 표기는 `D-N`, `D-Day`, `D+N` 규칙을 사용한다. 시험 일정 등록 제한 5개와 등록된 과목 비활성 처리도 대응된다. |
 | 알림/FCM 토큰 | 공통 후순위 | 양쪽 모두 알림 설정 조회/저장 API와 `my/fcm-token` API 선언은 있다. 다만 실제 Firebase/APNs 토큰 수집 및 자동 등록 흐름은 Android dev와 CMP 모두 현재 코드에서 확인되지 않는다. CMP만의 누락은 아니다. |
-| API endpoint surface | 대응됨 | Android `dev`의 인증, 홈, 과목/챕터/파트, 업로드, 퀴즈 생성/풀이/결과, 기록, 오답노트, 마이페이지 운영 엔드포인트는 CMP client에 대응된다. `feature:sample`의 `pokemon` 테스트 API는 비교 범위에서 제외한다. |
+| API endpoint surface | 대응됨 | Android `dev`의 인증, 홈, 과목/챕터/파트, 업로드, 퀴즈 생성/풀이/결과, 기록, 마이페이지 운영 엔드포인트는 CMP client에 대응된다. 오답노트는 양쪽 placeholder이므로 CMP transport graph에서 제외하며, `feature:sample`의 `pokemon` 테스트 API도 비교 범위에서 제외한다. |
 | API 명세 대조 | 대응됨 | `api명세.yml`의 method+path 기준으로 CMP client를 자동 추출 대조했을 때 `SPEC_NOT_IN_CMP`는 0개다. CMP에만 있는 `DELETE /chapters/{chapterId}`는 Android `dev`에도 이미 존재하는 챕터 삭제 API라 명세 누락 또는 추가 구현으로 본다. 최신 명세의 review/retry는 Android와 CMP 모두 `quiz-results/{resultId}` 기준으로 맞췄다. |
 | 새 API 명세 반영 | 대응됨 | 업로드 status 실패 응답의 `failCode`/`failMessage`를 Android/CMP 모델에 반영하고 UI 오류 문구는 `failMessage`를 우선 사용한다. Android `history`/`review` retry/review API도 `playSessionId`가 아닌 `resultId` path parameter 기준으로 정리했다. |
 | 퀴즈 생성 로딩 Lottie | 대응됨 | Android는 `app/src/main/assets/lottie/quiz_loading_full.json`, CMP는 `composeResources/files/quiz_loading_full.json`을 사용한다. CMP 화면은 compottie로 해당 에셋을 로드한다. |
@@ -300,7 +302,7 @@
 | Done | PDF/이미지 업로드 picker 포함 실서버 완료 | CMP는 서버 계약과 제한값 코드는 Android와 대응된다. iOS `PHPicker` 이미지 선택/버튼 활성과 `UIDocumentPicker` PDF 선택/버튼 활성은 실기 확인했다. API 기준 PDF/이미지 OCR 파일 업로드도 status completed 및 quiz-scope 반영 확인 | S2 PDF 업로드와 S3 이미지 OCR 업로드 모두 서버 완료. S3 1차 짧은 이미지는 `QUIZ_SCOPE_TEXT_INSUFFICIENT`로 서버가 정상 거절했고, rich image로 5문제 생성까지 통과 |
 | Done | 파트 분류 Android parity 재확인 | Android `dev`에는 `PartClassifySection` 컴포넌트가 있지만 현재 `UploadScreen`에서는 렌더링하지 않고 제출도 `PartClassifyMethod.AI`로 고정한다 | CMP도 일반 업로드 진입 시 기본값이 `Ai`이고 `파트 분류 방법` 섹션은 노출되지 않는다. 제출 기본값은 `partSplitMethod=Auto`라 Android 현재 동작과 맞다 |
 | Done | 자료 확인 polling 보강 유지 | Android는 MaterialCheck에서 status 1회 조회만 수행하지만 CMP는 완료 전 진입/네트워크 흔들림을 고려한 polling, retry, failed UI를 제공 | Android parity를 깨는 입력/출력 차이가 아니라 실패 대응 안정성 보강이므로 유지. 업로드 polling은 양쪽 모두 연속 실패/서버 failed를 실패 화면으로 처리 |
-| Done | 오답노트 탭 Android placeholder parity | Android `dev`는 placeholder지만 API/Repository/model 레이어는 있고, CMP는 같은 review API를 실제 화면까지 연결한 상태였음 | CMP 오답노트 탭을 Android와 동일한 placeholder로 맞춤. review client 표면은 유지 |
+| Done | 오답노트 탭 Android placeholder parity | Android `dev`는 placeholder지만 API/Repository/model 레이어는 있고, CMP는 같은 review API를 실제 화면까지 연결한 상태였음 | CMP 오답노트 탭을 Android와 동일한 placeholder로 맞춤. 이후 사용되지 않던 review client/model/DI graph는 제거 |
 | Done | 오답노트 placeholder 상단 구조 Android parity | Android 오답노트 placeholder는 `QuiketTopBar` 아래에 공사 중 문구와 일러스트를 표시하지만, CMP는 문구부터 바로 노출했음 | CMP 오답노트 placeholder에도 Android와 같은 상단 로고/아이콘 영역을 추가. `./gradlew :composeApp:compileCommonMainKotlinMetadata :composeApp:compileKotlinIosSimulatorArm64 :composeApp:compileDebugKotlinAndroid`, `xcodebuild ... build`, iOS Maestro 확인 통과. `/tmp/quiket_cmp_review_topbar_after_parity.png` |
 | Done | 마이페이지 대시보드 Android parity | CMP 마이페이지 상단이 `마이` 텍스트 버튼 구조이고 Android에 없는 레벨명/XP 텍스트가 노출됐음 | Android처럼 중앙 `마이페이지` 타이틀과 설정 아이콘을 사용하고, 추가 레벨명/XP 텍스트를 제거. `./gradlew :composeApp:compileCommonMainKotlinMetadata :composeApp:compileKotlinIosSimulatorArm64 :composeApp:compileDebugKotlinAndroid`, `xcodebuild ... build`, iOS Maestro 확인 통과. `/tmp/quiket_cmp_mypage_after_parity_cleanup.png` |
 | Done | 마이 하위 화면 bottom bar Android parity | Android main scaffold는 마이 설정/약관 상세에서도 bottom bar를 유지하지만, CMP는 `myPageDestination`을 Scaffold 밖에서 return해 하단 탭바가 사라졌음 | CMP mypage subdestination을 Scaffold content 내부에서 렌더링하도록 이동하고, bottom tab 클릭 시 과목 상세/마이 하위 화면 상태를 정리하도록 보정. iOS 약관 상세에서 하단 `마이` 탭 선택 상태가 유지됨을 확인. `/tmp/quiket_ios_cmp_settings_privacy_bottom_bar_fixed_latest.png` |

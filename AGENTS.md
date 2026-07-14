@@ -7,6 +7,8 @@ Use these instructions for AI coding work in this repository.
 - Before implementing or modifying code, read `docs/codex-preflight.md`.
 - Before creating or changing Compose screens, read `docs/compose-screen-conventions.md`.
 - Before adding modules, navigation entries, Gradle wiring, or resources, read `docs/module-conventions.md`.
+- Use `docs/validation.md` as the single source of truth for validation commands.
+- Before configuring another machine or creating release artifacts, read `docs/environment-setup.md`.
 - For KMP/Compose Multiplatform migration status, read `docs/kmp-current-status.md`; use `docs/kmp-migration-parity.md` only when detailed QA evidence is needed.
 - Treat `README.md`, `ARCHITECTURE.md`, and `RULES.md` as the project-level source of truth.
 - If these documents conflict, prefer the most specific document for the task and call out the conflict.
@@ -14,10 +16,11 @@ Use these instructions for AI coding work in this repository.
 ## Repository Shape
 
 - This repository is the KMP/Compose Multiplatform app.
-- Product code lives in `composeApp` as the shared KMP module.
+- `composeApp` is the Android application and iOS framework host.
+- Shared product code lives in `app-shell`, `core/*`, and `feature/*` KMP modules.
 - `iosApp` is the Swift/iOS host shell.
 - The legacy Android app lives in the separate Android repository and is only a QA parity reference when needed.
-- Do not assume feature-by-feature Gradle modules; this app is split by packages under `composeApp/src/commonMain`.
+- Follow the approved App Shell + Core + Feature modular-monolith boundaries in `ARCHITECTURE.md` and `docs/module-conventions.md`.
 
 ## Project Guardrails
 
@@ -27,6 +30,7 @@ Use these instructions for AI coding work in this repository.
 - Use `rg` or `rg --files` for search.
 - Use `apply_patch` for manual file edits.
 - Run the smallest meaningful Gradle validation for the changed surface.
+- Do not treat `NO-SOURCE` as behavioral test coverage or compile success as runtime QA.
 - Do not push unless the user explicitly asks for a push.
 
 ## Subagent Routing

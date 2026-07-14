@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  KAKAO_NATIVE_APP_KEY: ci1234567890
+
+jobs:
+  android:
+    name: Android And Shared Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set Up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Validate Gradle Wrapper
+        uses: gradle/actions/wrapper-validation@v6
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run Android Tests And Final Gates
+        run: |
+          ./gradlew \
+            :core:auth:testDebugUnitTest \
+            :core:network:testDebugUnitTest \
+            :core:platform:testDebugUnitTest \
+            :feature:auth:testDebugUnitTest \
+            :feature:history:testDebugUnitTest \
+            :feature:home:testDebugUnitTest \
+            :feature:mypage:testDebugUnitTest \
+            :feature:quiz:testDebugUnitTest \
+            :feature:subject:testDebugUnitTest \
+            :app-shell:testDebugUnitTest \
+            :composeApp:compileCommonMainKotlinMetadata \
+            :composeApp:compileDebugKotlinAndroid \
+            :composeApp:lintDebug
+
+      - name: Upload Android Reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-reports
+          path: |
+            **/build/test-results/**/*.xml
+            **/build/reports/tests/**
+            **/build/reports/lint-results-debug.*
+          if-no-files-found: ignore
+          retention-days: 14
+
+  ios:
+    name: iOS Shared Tests
+    runs-on: macos-15
+    timeout-minutes: 35
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set Up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Run iOS Simulator Tests And Final Compile
+        run: |
+          ./gradlew \
+            :core:auth:iosSimulatorArm64Test \
+            :core:network:iosSimulatorArm64Test \
+            :core:platform:iosSimulatorArm64Test \
+            :feature:auth:iosSimulatorArm64Test \
+            :feature:history:iosSimulatorArm64Test \
+            :feature:home:iosSimulatorArm64Test \
+            :feature:mypage:iosSimulatorArm64Test \
+            :feature:quiz:iosSimulatorArm64Test \
+            :feature:subject:iosSimulatorArm64Test \
+            :app-shell:iosSimulatorArm64Test \
+            :composeApp:compileKotlinIosSimulatorArm64
+
+      - name: Upload iOS Reports
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-reports
+          path: |
+            **/build/test-results/**/*.xml
+            **/build/reports/tests/**
+          if-no-files-found: ignore
+          retention-days: 14

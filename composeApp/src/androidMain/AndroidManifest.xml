@@ -3,6 +3,7 @@
 
     <application
         android:name=".QuiketApplication"
+        android:icon="@drawable/app_logo"
         android:theme="@style/Theme.QuiketComposeApp"
         android:label="Quiket"
         android:networkSecurityConfig="@xml/network_security_config">

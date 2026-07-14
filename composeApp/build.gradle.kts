@@ -52,7 +52,6 @@ kotlin {
     }
 
     listOf(
-        iosX64(),
         iosArm64(),
         iosSimulatorArm64(),
     ).forEach { iosTarget ->
@@ -65,6 +64,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
+            implementation(project(":app-shell"))
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material3)
@@ -83,6 +83,7 @@ kotlin {
         }
 
         androidMain.dependencies {
+            implementation(project(":core:auth"))
             implementation(libs.androidx.activity.compose)
             implementation(libs.kakao.v2.user)
             implementation(project.dependencies.platform(libs.koin.bom))

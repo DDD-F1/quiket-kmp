@@ -24,3 +24,15 @@ dependencyResolutionManagement {
 rootProject.name = "Quiket"
 
 include(":composeApp")
+include(":app-shell")
+include(":core:auth")
+include(":core:designsystem")
+include(":core:legal")
+include(":core:network")
+include(":core:platform")
+include(":feature:auth")
+include(":feature:history")
+include(":feature:home")
+include(":feature:mypage")
+include(":feature:quiz")
+include(":feature:subject")

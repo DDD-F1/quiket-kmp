@@ -4,7 +4,7 @@ Last synchronized: 2026-07-10
 OpenAPI version: `3.0.3`
 Quiket API version: `1.1.0`
 
-`openapi.yaml` is the version-controlled snapshot of the latest backend contract shared with this repository. The backend's Notion board and deployment state remain authoritative; update this file whenever the backend shares a newer contract.
+`openapi.yaml` is the version-controlled app contract and the source available to repository contributors. Backend deployment or internal board changes must be synchronized here before the app implementation treats them as a new contract. Record the synchronization date and API version in this document.
 
 ## Contract Rules
 
@@ -12,6 +12,7 @@ Quiket API version: `1.1.0`
 - Authenticated device-login endpoints require `X-Device-Id` and `X-Device-Name` headers.
 - Successful and failed responses use the `ApiResponse` envelope. Treat `success`, HTTP status, and `code` together when routing an auth flow.
 - Do not log or persist OAuth identity tokens, authorization codes, refresh tokens, Apple private keys, or backend secrets.
+- `agreedToTerms=true` must represent an explicit user action for the current terms version. Do not hard-code or default consent to `true` in an OAuth client, repository, use case, or StateHolder.
 
 ## OAuth Contract
 
@@ -31,7 +32,7 @@ Send `X-Device-Id`, `X-Device-Name`, and this JSON body:
 | `identityToken` | Yes | JWT returned by `ASAuthorizationAppleIDCredential`. |
 | `authorizationCode` | No | Send whenever Apple returns it. The backend exchanges it for a revoke-capable refresh token. |
 | `fullName` | No | Apple supplies the name only at first authorization. Combine the available name components and omit when unavailable. |
-| `agreedToTerms` | Conditionally | Must be `true` when the server is allowed to create a new Apple account immediately. |
+| `agreedToTerms` | Conditionally | Must be `true` only after explicit user consent when the server is allowed to create a new Apple account immediately. |
 
 Handle the response branches as follows:
 

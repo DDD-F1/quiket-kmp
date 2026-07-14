@@ -20,16 +20,5 @@ fun initKoin(
 internal expect val platformModule: Module
 
 internal val commonModule: Module = module {
-    includes(
-        networkModule,
-        authModule,
-        homeModule,
-        historyModule,
-        myPageModule,
-        mainModule,
-        quizModule,
-        quizResultModule,
-        reviewModule,
-        subjectModule,
-    )
+    includes(appShellModule)
 }

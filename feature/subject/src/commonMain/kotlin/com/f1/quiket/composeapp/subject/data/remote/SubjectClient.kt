@@ -1,0 +1,1151 @@
+package com.f1.quiket.composeapp.subject.data.remote
+
+import com.f1.quiket.composeapp.auth.SessionSnapshot
+import com.f1.quiket.composeapp.network.ApiException
+import com.f1.quiket.composeapp.network.decodeApiData
+import com.f1.quiket.composeapp.network.ensureTrailingSlash
+import com.f1.quiket.composeapp.network.requireApiSuccess
+import com.f1.quiket.composeapp.subject.domain.model.PickedUploadFile
+import com.f1.quiket.composeapp.subject.domain.model.Certificate
+import com.f1.quiket.composeapp.subject.domain.model.Chapter
+import com.f1.quiket.composeapp.subject.domain.model.ChapterWithParts
+import com.f1.quiket.composeapp.subject.domain.model.CreatedSubject
+import com.f1.quiket.composeapp.subject.domain.model.LectureFileUploadType
+import com.f1.quiket.composeapp.subject.domain.model.LectureUploadAccepted
+import com.f1.quiket.composeapp.subject.domain.model.LectureUploadProgress
+import com.f1.quiket.composeapp.subject.domain.model.LectureUploadStatus
+import com.f1.quiket.composeapp.subject.domain.model.PartDetail
+import com.f1.quiket.composeapp.subject.domain.model.PartSplitMethod
+import com.f1.quiket.composeapp.subject.domain.model.PartSplitPlan
+import com.f1.quiket.composeapp.subject.domain.model.PartSummary
+import com.f1.quiket.composeapp.subject.domain.model.SubjectCreateInput
+import com.f1.quiket.composeapp.subject.domain.model.SubjectDetail
+import com.f1.quiket.composeapp.subject.domain.model.SubjectExamDetail
+import com.f1.quiket.composeapp.subject.domain.model.SubjectExamDetailInput
+import com.f1.quiket.composeapp.subject.domain.model.SubjectExamSchedule
+import com.f1.quiket.composeapp.subject.domain.model.SubjectException
+import com.f1.quiket.composeapp.subject.domain.model.SubjectListItem
+import com.f1.quiket.composeapp.subject.domain.model.SubjectOtherDetail
+import com.f1.quiket.composeapp.subject.domain.model.SubjectOtherDetailInput
+import com.f1.quiket.composeapp.subject.domain.model.SubjectReviewDetail
+import com.f1.quiket.composeapp.subject.domain.model.SubjectReviewDetailInput
+import io.ktor.client.HttpClient
+import io.ktor.client.request.delete
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.patch
+import io.ktor.client.request.post
+import io.ktor.client.request.parameter
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.request.forms.InputProvider
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.http.headersOf
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
+
+internal class SubjectClient(
+    private val httpClient: HttpClient,
+    private val json: Json,
+    private val baseUrl: String,
+) {
+    suspend fun getSubjects(
+        session: SessionSnapshot,
+        page: Int = 0,
+        size: Int = 50,
+    ): List<SubjectListItem> {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.get("${baseUrl.ensureTrailingSlash()}subjects") {
+            header("Authorization", authorization)
+            parameter("page", page)
+            parameter("size", size)
+        }
+
+        return response.decodeSubjectData<SubjectPageResponse>(
+            missingMessage = "과목 응답에 데이터가 없습니다.",
+            failureMessage = "과목 정보를 불러오지 못했습니다.",
+            dataFailureMessage = "과목 응답을 해석하지 못했습니다.",
+        ).content.map { it.toDomain() }
+    }
+
+    suspend fun createSubject(
+        session: SessionSnapshot,
+        input: SubjectCreateInput,
+    ): CreatedSubject {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}subjects") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(input.toRequest())
+        }
+
+        return response.decodeSubjectData<SubjectResponse>(
+            missingMessage = "과목 생성 응답에 데이터가 없습니다.",
+            failureMessage = "과목을 만들지 못했습니다.",
+            dataFailureMessage = "과목 생성 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun getSubject(
+        session: SessionSnapshot,
+        subjectId: String,
+    ): SubjectDetail {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.get("${baseUrl.ensureTrailingSlash()}subjects/$subjectId") {
+            header("Authorization", authorization)
+        }
+
+        return response.decodeSubjectData<SubjectDetailResponse>(
+            missingMessage = "과목 응답에 데이터가 없습니다.",
+            failureMessage = "과목 정보를 불러오지 못했습니다.",
+            dataFailureMessage = "과목 응답을 해석하지 못했습니다.",
+        ).toDomain(json)
+    }
+
+    suspend fun deleteSubject(
+        session: SessionSnapshot,
+        subjectId: String,
+    ) {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.delete("${baseUrl.ensureTrailingSlash()}subjects/$subjectId") {
+            header("Authorization", authorization)
+        }
+
+        response.requireSubjectSuccess(failureMessage = "과목을 삭제하지 못했습니다.")
+    }
+
+    suspend fun upsertExamSchedule(
+        session: SessionSnapshot,
+        subjectId: String,
+        examName: String?,
+        examDate: String,
+    ): SubjectExamSchedule {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.put("${baseUrl.ensureTrailingSlash()}subjects/$subjectId/exam-schedule") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(
+                SubjectExamScheduleUpsertRequest(
+                    examName = examName,
+                    examDate = examDate,
+                ),
+            )
+        }
+
+        return response.decodeSubjectData<SubjectExamScheduleResponse>(
+            missingMessage = "시험 일정 응답에 데이터가 없습니다.",
+            failureMessage = "시험 일정을 저장하지 못했습니다.",
+            dataFailureMessage = "시험 일정 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun deleteExamSchedule(
+        session: SessionSnapshot,
+        subjectId: String,
+    ) {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.delete("${baseUrl.ensureTrailingSlash()}subjects/$subjectId/exam-schedule") {
+            header("Authorization", authorization)
+        }
+
+        response.requireSubjectSuccess(failureMessage = "시험 일정을 삭제하지 못했습니다.")
+    }
+
+    suspend fun getCertificates(session: SessionSnapshot): List<Certificate> {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.get("${baseUrl.ensureTrailingSlash()}certificates") {
+            header("Authorization", authorization)
+        }
+
+        return response.decodeSubjectData<List<CertificateResponse>>(
+            missingMessage = "자격증 목록 응답에 데이터가 없습니다.",
+            failureMessage = "자격증 목록을 불러오지 못했습니다.",
+            dataFailureMessage = "자격증 목록 응답을 해석하지 못했습니다.",
+        ).map { it.toDomain() }
+            .sortedWith(compareBy<Certificate> { it.displayOrder }.thenBy { it.name })
+    }
+
+    suspend fun updateSubjectName(
+        session: SessionSnapshot,
+        subjectId: String,
+        name: String,
+    ): CreatedSubject {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.patch("${baseUrl.ensureTrailingSlash()}subjects/$subjectId/name") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(SubjectNameUpdateRequest(name = name))
+        }
+
+        return response.decodeSubjectData<SubjectResponse>(
+            missingMessage = "과목명 수정 응답에 데이터가 없습니다.",
+            failureMessage = "과목명을 수정하지 못했습니다.",
+            dataFailureMessage = "과목명 수정 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun updateSubjectDetails(
+        session: SessionSnapshot,
+        subjectId: String,
+        input: SubjectCreateInput,
+    ): CreatedSubject {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.put("${baseUrl.ensureTrailingSlash()}subjects/$subjectId/details") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(input.toRequest())
+        }
+
+        return response.decodeSubjectData<SubjectResponse>(
+            missingMessage = "과목 유형 수정 응답에 데이터가 없습니다.",
+            failureMessage = "과목 유형을 수정하지 못했습니다.",
+            dataFailureMessage = "과목 유형 수정 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun updateChapterName(
+        session: SessionSnapshot,
+        chapterId: String,
+        name: String,
+    ): Chapter {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.patch("${baseUrl.ensureTrailingSlash()}chapters/$chapterId/name") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(ChapterNameUpdateRequest(name = name))
+        }
+
+        return response.decodeSubjectData<ChapterResponse>(
+            missingMessage = "챕터명 수정 응답에 데이터가 없습니다.",
+            failureMessage = "챕터명을 수정하지 못했습니다.",
+            dataFailureMessage = "챕터명 수정 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun deleteChapter(
+        session: SessionSnapshot,
+        chapterId: String,
+    ) {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.delete("${baseUrl.ensureTrailingSlash()}chapters/$chapterId") {
+            header("Authorization", authorization)
+        }
+
+        response.requireSubjectSuccess(failureMessage = "챕터를 삭제하지 못했습니다.")
+    }
+
+    suspend fun getPart(
+        session: SessionSnapshot,
+        partId: String,
+    ): PartDetail {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.get("${baseUrl.ensureTrailingSlash()}parts/$partId") {
+            header("Authorization", authorization)
+        }
+
+        return response.decodeSubjectData<PartResponse>(
+            missingMessage = "파트 응답에 데이터가 없습니다.",
+            failureMessage = "파트 정보를 불러오지 못했습니다.",
+            dataFailureMessage = "파트 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun updatePart(
+        session: SessionSnapshot,
+        partId: String,
+        name: String,
+        content: String,
+    ): PartDetail {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.patch("${baseUrl.ensureTrailingSlash()}parts/$partId") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(PartUpdateRequest(name = name, content = content))
+        }
+
+        return response.decodeSubjectData<PartResponse>(
+            missingMessage = "파트 응답에 데이터가 없습니다.",
+            failureMessage = "파트 정보를 저장하지 못했습니다.",
+            dataFailureMessage = "파트 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun createTextLectureUpload(
+        session: SessionSnapshot,
+        subjectId: String,
+        chapterName: String?,
+        text: String,
+        partSplitMethod: PartSplitMethod = PartSplitMethod.Auto,
+        partSplitPlans: List<PartSplitPlan> = emptyList(),
+    ): LectureUploadAccepted {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}lecture-uploads") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(
+                LectureTextUploadRequest(
+                    subjectId = subjectId,
+                    chapterName = chapterName,
+                    uploadType = "text",
+                    partSplitMethod = partSplitMethod.wireValue,
+                    text = text,
+                    partSplitPlans = partSplitPlans.takeIf { it.isNotEmpty() }
+                        ?.map { it.toRequest() },
+                ),
+            )
+        }
+
+        return response.decodeSubjectData<LectureUploadAcceptedResponse>(
+            missingMessage = "자료 업로드 응답에 데이터가 없습니다.",
+            failureMessage = "자료 업로드를 시작하지 못했습니다.",
+            dataFailureMessage = "자료 업로드 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun createFileLectureUpload(
+        session: SessionSnapshot,
+        subjectId: String,
+        chapterName: String?,
+        uploadType: LectureFileUploadType,
+        files: List<PickedUploadFile>,
+        partSplitMethod: PartSplitMethod = PartSplitMethod.Auto,
+        partSplitPlans: List<PartSplitPlan> = emptyList(),
+    ): LectureUploadAccepted {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+        if (files.isEmpty()) {
+            throw SubjectException("업로드할 파일을 선택해주세요.")
+        }
+
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}lecture-uploads") {
+            header("Authorization", authorization)
+            setBody(
+                buildMultipartContent(
+                    textParts = buildList {
+                        add("subjectId" to subjectId)
+                        chapterName?.takeIf { it.isNotBlank() }?.let { add("chapterName" to it) }
+                        add("uploadType" to uploadType.wireValue)
+                        add("partSplitMethod" to partSplitMethod.wireValue)
+                        partSplitPlans.takeIf { it.isNotEmpty() }?.let { plans ->
+                            add(
+                                "partSplitPlansJson" to json.encodeToString(
+                                    ListSerializer(PartSplitPlanRequest.serializer()),
+                                    plans.map { it.toRequest() },
+                                ),
+                            )
+                        }
+                    },
+                    files = files,
+                ),
+            )
+        }
+
+        return response.decodeSubjectData<LectureUploadAcceptedResponse>(
+            missingMessage = "자료 업로드 응답에 데이터가 없습니다.",
+            failureMessage = "자료 업로드를 시작하지 못했습니다.",
+            dataFailureMessage = "자료 업로드 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun addTextPartToChapter(
+        session: SessionSnapshot,
+        chapterId: String,
+        partName: String,
+        text: String,
+    ): LectureUploadAccepted {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}chapters/$chapterId/parts") {
+            header("Authorization", authorization)
+            contentType(ContentType.Application.Json)
+            setBody(
+                PartTextAddRequest(
+                    partName = partName,
+                    uploadType = "text",
+                    text = text,
+                ),
+            )
+        }
+
+        return response.decodeSubjectData<LectureUploadAcceptedResponse>(
+            missingMessage = "파트 추가 응답에 데이터가 없습니다.",
+            failureMessage = "파트 추가를 시작하지 못했습니다.",
+            dataFailureMessage = "자료 업로드 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun addFilePartToChapter(
+        session: SessionSnapshot,
+        chapterId: String,
+        partName: String,
+        uploadType: LectureFileUploadType,
+        files: List<PickedUploadFile>,
+    ): LectureUploadAccepted {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+        if (files.isEmpty()) {
+            throw SubjectException("업로드할 파일을 선택해주세요.")
+        }
+
+        val response = httpClient.post("${baseUrl.ensureTrailingSlash()}chapters/$chapterId/parts") {
+            header("Authorization", authorization)
+            setBody(
+                buildMultipartContent(
+                    textParts = listOf(
+                        "partName" to partName,
+                        "uploadType" to uploadType.wireValue,
+                    ),
+                    files = files,
+                ),
+            )
+        }
+
+        return response.decodeSubjectData<LectureUploadAcceptedResponse>(
+            missingMessage = "파트 추가 응답에 데이터가 없습니다.",
+            failureMessage = "파트 추가를 시작하지 못했습니다.",
+            dataFailureMessage = "자료 업로드 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    suspend fun getLectureUploadStatus(
+        session: SessionSnapshot,
+        lectureUploadId: String,
+    ): LectureUploadProgress {
+        val authorization = session.authorizationHeader()
+            ?: throw SubjectException("로그인이 필요합니다.", isUnauthorized = true)
+
+        val response = httpClient.get("${baseUrl.ensureTrailingSlash()}lecture-uploads/$lectureUploadId/status") {
+            header("Authorization", authorization)
+        }
+
+        return response.decodeSubjectData<LectureUploadStatusResponse>(
+            missingMessage = "업로드 상태 응답에 데이터가 없습니다.",
+            failureMessage = "업로드 상태를 확인하지 못했습니다.",
+            dataFailureMessage = "업로드 상태 응답을 해석하지 못했습니다.",
+        ).toDomain()
+    }
+
+    private suspend inline fun <reified T> HttpResponse.decodeSubjectData(
+        missingMessage: String,
+        failureMessage: String,
+        dataFailureMessage: String,
+    ): T = try {
+        decodeApiData(
+            json = json,
+            missingMessage = missingMessage,
+            failureMessage = failureMessage,
+            dataFailureMessage = dataFailureMessage,
+        )
+    } catch (error: ApiException) {
+        throw error.toSubjectException()
+    }
+
+    private suspend fun HttpResponse.requireSubjectSuccess(failureMessage: String) {
+        try {
+            requireApiSuccess(json = json, failureMessage = failureMessage)
+        } catch (error: ApiException) {
+            throw error.toSubjectException()
+        }
+
+    }
+
+    private fun ApiException.toSubjectException(): SubjectException = SubjectException(
+        message = message.orEmpty(),
+        isUnauthorized = isUnauthorized,
+        statusCode = statusCode,
+    )
+}
+
+@Serializable
+private data class SubjectPageResponse(
+    val content: List<SubjectSummaryResponse> = emptyList(),
+    val page: Int = 0,
+    val size: Int = 0,
+    val totalElements: Long = 0,
+    val totalPages: Int = 0,
+    val hasNext: Boolean = false,
+)
+
+@Serializable
+private data class SubjectSummaryResponse(
+    val id: String,
+    val name: String,
+    val purpose: String,
+    val chapterCount: Int,
+    val partCount: Int,
+) {
+    fun toDomain(): SubjectListItem = SubjectListItem(
+        id = id,
+        name = name,
+        purpose = purpose,
+        chapterCount = chapterCount,
+        partCount = partCount,
+    )
+}
+
+@Serializable
+private data class CertificateResponse(
+    val id: Long,
+    val name: String,
+    val featured: Boolean = false,
+    val displayOrder: Int = Int.MAX_VALUE,
+) {
+    fun toDomain(): Certificate = Certificate(
+        id = id,
+        name = name,
+        featured = featured,
+        displayOrder = displayOrder,
+    )
+}
+
+@Serializable
+private data class SubjectResponse(
+    val id: String,
+    val name: String,
+    val purpose: String,
+    val createdAt: String,
+) {
+    fun toDomain(): CreatedSubject = CreatedSubject(
+        id = id,
+        name = name,
+        purpose = purpose,
+        createdAt = createdAt,
+    )
+}
+
+@Serializable
+private data class SubjectCreateRequest(
+    val name: String,
+    val purpose: String,
+    val examDetail: SubjectExamDetailRequest? = null,
+    val reviewDetail: SubjectReviewDetailRequest? = null,
+    val otherDetail: SubjectOtherDetailRequest? = null,
+)
+
+private fun SubjectCreateInput.toRequest(): SubjectCreateRequest = SubjectCreateRequest(
+    name = name.ifBlank { "새 과목" },
+    purpose = purpose.wireValue,
+    examDetail = examDetail?.toRequest(),
+    reviewDetail = reviewDetail?.toRequest(),
+    otherDetail = otherDetail?.toRequest(),
+)
+
+private fun SubjectExamDetailInput.toRequest(): SubjectExamDetailRequest = SubjectExamDetailRequest(
+    examType = examType,
+    univMajorField = univMajorField,
+    univMajorName = univMajorName,
+    univCourseType = univCourseType,
+    mhGrade = mhGrade,
+    mhSubjectType = mhSubjectType,
+    certificateId = certificateId,
+    certificateName = certificateName,
+    civilRank = civilRank,
+    civilSeries = civilSeries,
+    langType = langType,
+    langExamName = langExamName,
+    otherExamName = otherExamName,
+)
+
+private fun SubjectReviewDetailInput.toRequest(): SubjectReviewDetailRequest = SubjectReviewDetailRequest(
+    field = field,
+    studyLevel = studyLevel,
+)
+
+private fun SubjectOtherDetailInput.toRequest(): SubjectOtherDetailRequest = SubjectOtherDetailRequest(
+    usagePurpose = usagePurpose,
+    description = description,
+)
+
+@Serializable
+private data class SubjectNameUpdateRequest(
+    val name: String,
+)
+
+@Serializable
+private data class SubjectExamScheduleUpsertRequest(
+    val examName: String? = null,
+    val examDate: String,
+)
+
+@Serializable
+private data class ChapterNameUpdateRequest(
+    val name: String,
+)
+
+@Serializable
+private data class SubjectExamDetailRequest(
+    val examType: String,
+    val univMajorField: String? = null,
+    val univMajorName: String? = null,
+    val univCourseType: String? = null,
+    val mhGrade: String? = null,
+    val mhSubjectType: String? = null,
+    val certificateId: String? = null,
+    val certificateName: String? = null,
+    val civilRank: String? = null,
+    val civilSeries: String? = null,
+    val langType: String? = null,
+    val langExamName: String? = null,
+    val otherExamName: String? = null,
+)
+
+@Serializable
+private data class SubjectReviewDetailRequest(
+    val field: String,
+    val studyLevel: String,
+)
+
+@Serializable
+private data class SubjectOtherDetailRequest(
+    val usagePurpose: String,
+    val description: String? = null,
+)
+
+@Serializable
+private data class SubjectDetailResponse(
+    val id: String,
+    val name: String,
+    val purpose: String,
+    val detail: JsonElement? = null,
+    val examDetail: JsonElement? = null,
+    val reviewDetail: JsonElement? = null,
+    val otherDetail: JsonElement? = null,
+    val createdAt: String,
+    val examSchedule: SubjectExamScheduleResponse? = null,
+    val chapters: List<ChapterWithPartsResponse> = emptyList(),
+) {
+    fun toDomain(json: Json): SubjectDetail {
+        val purposeLower = purpose.lowercase()
+        val detailWrapper = detail?.takeIf { it != JsonNull } as? JsonObject
+        val examDetailJson = examDetail?.takeIf { it != JsonNull }
+            ?: detailWrapper?.get("examDetail")?.takeIf { it != JsonNull }
+            ?: detail?.takeIf { it != JsonNull }
+        val reviewDetailJson = reviewDetail?.takeIf { it != JsonNull }
+            ?: detailWrapper?.get("reviewDetail")?.takeIf { it != JsonNull }
+            ?: detail?.takeIf { it != JsonNull }
+        val otherDetailJson = otherDetail?.takeIf { it != JsonNull }
+            ?: detailWrapper?.get("otherDetail")?.takeIf { it != JsonNull }
+            ?: detail?.takeIf { it != JsonNull }
+        val mappedExamDetail = if (purposeLower == "exam") {
+            examDetailJson?.decodeOrNull<SubjectExamDetailResponse>(json)?.toDomain()
+        } else {
+            null
+        }
+        val mappedReviewDetail = if (purposeLower == "review" || purposeLower == "self_study") {
+            reviewDetailJson?.decodeOrNull<SubjectReviewDetailResponse>(json)?.toDomain()
+        } else {
+            null
+        }
+        val mappedOtherDetail = if (purposeLower == "other") {
+            otherDetailJson?.decodeOrNull<SubjectOtherDetailResponse>(json)?.toDomain()
+        } else {
+            null
+        }
+
+        return SubjectDetail(
+            id = id,
+            name = name,
+            purpose = purpose,
+            detailLabel = when (purposeLower) {
+                "exam" -> mappedExamDetail?.displayLabel()
+                "review",
+                "self_study",
+                -> mappedReviewDetail?.displayLabel()
+                "other" -> mappedOtherDetail?.displayLabel()
+                else -> null
+            },
+            examDetail = mappedExamDetail,
+            reviewDetail = mappedReviewDetail,
+            otherDetail = mappedOtherDetail,
+            createdAt = createdAt,
+            examSchedule = examSchedule?.toDomain(),
+            chapters = chapters.map { it.toDomain() },
+        )
+    }
+}
+
+@Serializable
+private data class SubjectExamDetailResponse(
+    val examType: String = "",
+    val univMajorField: String? = null,
+    val certificateName: String? = null,
+    val certificateId: String? = null,
+    val otherExamName: String? = null,
+    val langExamName: String? = null,
+    val langType: String? = null,
+    val mhGrade: String? = null,
+    val mhSubjectType: String? = null,
+    val civilRank: String? = null,
+    val civilSeries: String? = null,
+    val univMajorName: String? = null,
+    val univCourseType: String? = null,
+) {
+    fun toDomain(): SubjectExamDetail = SubjectExamDetail(
+        examType = examType,
+        univMajorField = univMajorField,
+        univMajorName = univMajorName,
+        univCourseType = univCourseType,
+        mhGrade = mhGrade,
+        mhSubjectType = mhSubjectType,
+        certificateId = certificateId,
+        certificateName = certificateName,
+        civilRank = civilRank,
+        civilSeries = civilSeries,
+        langType = langType,
+        langExamName = langExamName,
+        otherExamName = otherExamName,
+    )
+}
+
+@Serializable
+private data class SubjectReviewDetailResponse(
+    val field: String = "",
+    val studyLevel: String = "",
+) {
+    fun toDomain(): SubjectReviewDetail = SubjectReviewDetail(
+        field = field,
+        studyLevel = studyLevel,
+    )
+}
+
+@Serializable
+private data class SubjectOtherDetailResponse(
+    val usagePurpose: String = "",
+    val description: String? = null,
+) {
+    fun toDomain(): SubjectOtherDetail = SubjectOtherDetail(
+        usagePurpose = usagePurpose,
+        description = description,
+    )
+}
+
+@Serializable
+private data class SubjectExamScheduleResponse(
+    val id: String,
+    val subjectId: String,
+    val examName: String,
+    val examDate: String,
+    val dDay: Int? = null,
+) {
+    fun toDomain(): SubjectExamSchedule = SubjectExamSchedule(
+        id = id,
+        subjectId = subjectId,
+        examName = examName,
+        examDate = examDate,
+        dDay = dDay,
+    )
+}
+
+@Serializable
+private data class ChapterWithPartsResponse(
+    val id: String,
+    val subjectId: String,
+    val name: String,
+    val displayOrder: Int,
+    val parts: List<PartSummaryResponse> = emptyList(),
+) {
+    fun toDomain(): ChapterWithParts = ChapterWithParts(
+        id = id,
+        subjectId = subjectId,
+        name = name,
+        displayOrder = displayOrder,
+        parts = parts.map { it.toDomain() },
+    )
+}
+
+@Serializable
+private data class ChapterResponse(
+    val id: String,
+    val subjectId: String,
+    val name: String,
+    val displayOrder: Int,
+) {
+    fun toDomain(): Chapter = Chapter(
+        id = id,
+        subjectId = subjectId,
+        name = name,
+        displayOrder = displayOrder,
+    )
+}
+
+@Serializable
+private data class PartSummaryResponse(
+    val id: String,
+    val chapterId: String,
+    val name: String,
+    val partNumber: Int,
+    val contentPreview: String? = null,
+) {
+    fun toDomain(): PartSummary = PartSummary(
+        id = id,
+        chapterId = chapterId,
+        name = name,
+        partNumber = partNumber,
+        contentPreview = contentPreview,
+    )
+}
+
+@Serializable
+private data class PartResponse(
+    val id: String,
+    val chapterId: String,
+    val name: String,
+    val partNumber: Int,
+    val contentPreview: String? = null,
+    val subjectId: String? = null,
+    val lectureUploadId: String? = null,
+    val content: String? = null,
+) {
+    fun toDomain(): PartDetail = PartDetail(
+        id = id,
+        chapterId = chapterId,
+        name = name,
+        partNumber = partNumber,
+        contentPreview = contentPreview,
+        subjectId = subjectId,
+        lectureUploadId = lectureUploadId,
+        content = content,
+    )
+}
+
+@Serializable
+private data class PartUpdateRequest(
+    val name: String,
+    val content: String,
+)
+
+@Serializable
+private data class LectureTextUploadRequest(
+    val subjectId: String,
+    val chapterName: String? = null,
+    val uploadType: String,
+    val partSplitMethod: String,
+    val text: String,
+    val partSplitPlans: List<PartSplitPlanRequest>? = null,
+)
+
+@Serializable
+private data class PartTextAddRequest(
+    val partName: String,
+    val uploadType: String,
+    val text: String,
+)
+
+@Serializable
+private data class PartSplitPlanRequest(
+    val partNumber: Int,
+    val intendedName: String? = null,
+)
+
+private fun PartSplitPlan.toRequest(): PartSplitPlanRequest = PartSplitPlanRequest(
+    partNumber = partNumber,
+    intendedName = intendedName,
+)
+
+private fun String.toMultipartFileName(): String =
+    replace("\"", "")
+        .replace("\r", "")
+        .replace("\n", "")
+        .ifBlank { "upload" }
+
+internal fun buildMultipartContent(
+    textParts: List<Pair<String, String>>,
+    files: List<PickedUploadFile>,
+): MultiPartFormDataContent = MultiPartFormDataContent(
+    parts = formData {
+        textParts.forEach { (name, value) ->
+            append(name.toMultipartFieldName(), value)
+        }
+        files.forEach { file ->
+            append(
+                key = "files",
+                value = InputProvider(size = file.sizeBytes, block = file::openSource),
+                headers = headersOf(
+                    HttpHeaders.ContentDisposition to listOf(
+                        "filename=\"${file.name.toMultipartFileName()}\"",
+                    ),
+                    HttpHeaders.ContentType to listOf(file.mimeType.toMultipartContentType()),
+                ),
+            )
+        }
+    },
+)
+
+private fun String.toMultipartFieldName(): String =
+    replace("\"", "")
+        .replace("\r", "")
+        .replace("\n", "")
+
+private fun String.toMultipartContentType(): String =
+    runCatching { ContentType.parse(this).toString() }
+        .getOrDefault(ContentType.Application.OctetStream.toString())
+
+@Serializable
+private data class LectureUploadAcceptedResponse(
+    val lectureUploadId: String,
+    val subjectId: String,
+    val chapterId: String,
+    val status: String,
+    val estimatedSeconds: Int? = null,
+) {
+    fun toDomain(): LectureUploadAccepted = LectureUploadAccepted(
+        lectureUploadId = lectureUploadId,
+        subjectId = subjectId,
+        chapterId = chapterId,
+        status = status.toLectureUploadStatus(),
+        estimatedSeconds = estimatedSeconds,
+    )
+}
+
+@Serializable
+private data class LectureUploadStatusResponse(
+    val lectureUploadId: String,
+    val subjectId: String,
+    val chapterId: String,
+    val status: String,
+    val estimatedSeconds: Int? = null,
+    val chapterName: String? = null,
+    val progressPct: Int? = null,
+    val parts: List<PartSummaryResponse> = emptyList(),
+    val failCode: String? = null,
+    val failMessage: String? = null,
+    val failReason: String? = null,
+) {
+    fun toDomain(): LectureUploadProgress = LectureUploadProgress(
+        lectureUploadId = lectureUploadId,
+        subjectId = subjectId,
+        chapterId = chapterId,
+        status = status.toLectureUploadStatus(),
+        estimatedSeconds = estimatedSeconds,
+        chapterName = chapterName,
+        progressPct = progressPct,
+        parts = parts.map { it.toDomain() },
+        failCode = failCode,
+        failMessage = failMessage,
+        failReason = failReason,
+    )
+}
+
+private inline fun <reified T> JsonElement.decodeOrNull(json: Json): T? =
+    runCatching { json.decodeFromJsonElement<T>(this) }.getOrNull()
+
+private fun String.toExamTypeLabel(): String? = when (lowercase()) {
+    "certificate" -> "자격증"
+    "university" -> "대학교"
+    "middle_high" -> "중고등"
+    "civil_service" -> "공무원"
+    "language" -> "어학"
+    "other",
+    "other_exam",
+    -> "기타 시험"
+    else -> takeIf { it.isNotBlank() }
+}
+
+private fun String.toStudyFieldLabel(): String = when (lowercase()) {
+    "humanities" -> "인문"
+    "korean_history" -> "한국사"
+    "world_history" -> "세계사"
+    "society" -> "사회"
+    "politics" -> "정치"
+    "economics" -> "경제"
+    "business" -> "경영"
+    "science_tech" -> "과학기술"
+    "it" -> "IT"
+    "culture_art" -> "문화예술"
+    "psychology" -> "심리학"
+    "custom" -> "직접 입력"
+    else -> this
+}
+
+private fun String.toStudyLevelLabel(): String = when (lowercase()) {
+    "beginner" -> "입문자"
+    "casual" -> "초급자"
+    "regular" -> "중급자"
+    "expert" -> "고급자"
+    else -> this
+}
+
+private fun String.toUsagePurposeLabel(): String = when (lowercase()) {
+    "work" -> "업무·실무 활용"
+    "personal" -> "개인 기록·정리"
+    "hobby" -> "취미·가벼운 학습"
+    "memory" -> "기억·암기 보조"
+    "other" -> "기타"
+    else -> this
+}
+
+private fun SubjectExamDetail.displayLabel(): String? {
+    val detail = when (examType.lowercase()) {
+        "university" -> listOfNotNull(
+            univMajorName?.takeIf { it.isNotBlank() },
+            univCourseType?.toCourseTypeLabel(),
+        ).joinNonBlank()
+        "middle_high" -> listOfNotNull(
+            mhGrade?.toMiddleHighCurriculumLabel(),
+            mhSubjectType?.toMiddleHighSubjectTypeLabel(),
+        ).joinNonBlank()
+        "certificate" -> certificateName.orEmpty()
+        "civil_service",
+        "civil_servant",
+        -> listOfNotNull(
+            civilSeries?.toCivilSeriesLabel(),
+            civilRank?.toCivilGradeLabel(),
+        ).joinNonBlank()
+        "language" -> listOfNotNull(
+            langType?.toLanguageTypeLabel(),
+            langExamName?.toLanguageExamLabel(),
+        ).joinNonBlank()
+        "other",
+        "other_exam",
+        -> otherExamName.orEmpty()
+        else -> ""
+    }
+
+    return listOfNotNull(
+        examType.toExamTypeLabel(),
+        detail.takeIf { it.isNotBlank() },
+    ).joinNonBlank().ifBlank { null }
+}
+
+private fun SubjectReviewDetail.displayLabel(): String? =
+    listOf(
+        field.toStudyFieldLabel(),
+        studyLevel.toStudyLevelLabel(),
+    ).joinNonBlank().ifBlank { null }
+
+private fun SubjectOtherDetail.displayLabel(): String? =
+    listOfNotNull(
+        usagePurpose.toUsagePurposeLabel(),
+        description?.takeIf { it.isNotBlank() },
+    ).joinNonBlank().ifBlank { null }
+
+private fun List<String>.joinNonBlank(): String =
+    filter { it.isNotBlank() }.joinToString(" · ")
+
+private fun String.toCourseTypeLabel(): String = when (lowercase()) {
+    "major" -> "전공"
+    "liberal",
+    "liberal_arts",
+    -> "교양"
+    else -> this
+}
+
+private fun String.toMiddleHighCurriculumLabel(): String = when (lowercase()) {
+    "elem" -> "초등"
+    "middle" -> "중학"
+    "high1" -> "고1"
+    "high2" -> "고2"
+    "high3" -> "고3"
+    "csat" -> "수능"
+    else -> this
+}
+
+private fun String.toMiddleHighSubjectTypeLabel(): String = when (lowercase()) {
+    "korean" -> "국어"
+    "math" -> "수학"
+    "english" -> "영어"
+    "science" -> "과학"
+    "social" -> "사회"
+    "history" -> "역사"
+    "ethics" -> "윤리"
+    "art" -> "예체능"
+    "custom" -> "직접 입력"
+    else -> this
+}
+
+private fun String.toLanguageTypeLabel(): String = when (lowercase()) {
+    "english" -> "영어"
+    "japanese" -> "일본어"
+    "chinese" -> "중국어"
+    else -> this
+}
+
+private fun String.toLanguageExamLabel(): String = when (lowercase()) {
+    "toeic" -> "TOEIC"
+    "toefl" -> "TOEFL"
+    "ielts" -> "IELTS"
+    "teps" -> "TEPS"
+    "opic" -> "OPIc"
+    "jlpt" -> "JLPT"
+    "jpt" -> "JPT"
+    "hsk" -> "HSK"
+    "hskk" -> "HSKK"
+    "custom" -> "직접 입력"
+    else -> this
+}
+
+private fun String.toCivilGradeLabel(): String = when (lowercase()) {
+    "grade9" -> "9급"
+    "grade7" -> "7급"
+    "grade5" -> "5급"
+    "police" -> "경찰직"
+    "fire" -> "소방직"
+    "special" -> "기타 특수직"
+    else -> this
+}
+
+private fun String.toCivilSeriesLabel(): String = when (lowercase()) {
+    "admin" -> "행정"
+    "tax" -> "세무"
+    "custom_duty" -> "관세"
+    "social_welfare" -> "사회복지"
+    "education" -> "교육행정"
+    "labor" -> "고용노동"
+    "judiciary" -> "법원"
+    "prosecution" -> "검찰"
+    "police" -> "경찰"
+    "fire" -> "소방"
+    "military" -> "군무원"
+    "other" -> "기타"
+    else -> this
+}
+
+private fun String.toLectureUploadStatus(): LectureUploadStatus =
+    LectureUploadStatus.entries.firstOrNull { it.wireValue == lowercase() }
+        ?: LectureUploadStatus.Unknown
+
+private fun SessionSnapshot.authorizationHeader(): String? {
+    val token = accessToken?.takeIf { it.isNotBlank() } ?: return null
+    val type = tokenType?.takeIf { it.isNotBlank() } ?: "Bearer"
+    return "$type $token"
+}
