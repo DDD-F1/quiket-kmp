@@ -12,6 +12,7 @@ import com.f1.quiket.composeapp.auth.domain.model.AuthTokenData
 import com.f1.quiket.composeapp.auth.domain.model.KakaoAccountLinkRequired
 import com.f1.quiket.composeapp.auth.domain.model.KakaoNicknameRequired
 import com.f1.quiket.composeapp.network.toUserFacingMessage
+import com.f1.quiket.composeapp.util.runSuspendCatching
 import kotlinx.coroutines.launch
 
 data class OAuthAuthDraft(
@@ -81,7 +82,7 @@ fun OAuthNicknameRoute(
         isSubmitting = true
         nicknameErrorMessage = null
         coroutineScope.launch {
-            runCatching {
+            runSuspendCatching {
                 onCompleteNickname(draft.signupToken, trimmedNickname)
             }.onSuccess { tokenData ->
                 onComplete(tokenData)
@@ -122,7 +123,7 @@ fun OAuthAccountLinkRoute(
         isSubmitting = true
         passwordErrorMessage = null
         coroutineScope.launch {
-            runCatching {
+            runSuspendCatching {
                 onLinkAccount(draft.linkToken, draft.linkEmail, password)
             }.onSuccess { tokenData ->
                 onComplete(tokenData)

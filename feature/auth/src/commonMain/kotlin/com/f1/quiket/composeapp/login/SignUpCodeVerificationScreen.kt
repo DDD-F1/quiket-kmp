@@ -43,6 +43,7 @@ import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.network.toUserFacingMessage
 import com.f1.quiket.composeapp.network.withNetworkRetryGuide
+import com.f1.quiket.composeapp.util.runSuspendCatching
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -71,7 +72,7 @@ fun SignUpCodeVerificationRoute(
         verificationCodeErrorMessage = null
         noticeMessage = null
         coroutineScope.launch {
-            runCatching {
+            runSuspendCatching {
                 authStateHolder.resendEmailVerification(draft.email)
             }.onSuccess { result ->
                 timerSeconds = result.expiresInSeconds.toInt()
@@ -88,7 +89,7 @@ fun SignUpCodeVerificationRoute(
         verificationCodeErrorMessage = null
         noticeMessage = null
         coroutineScope.launch {
-            runCatching {
+            runSuspendCatching {
                 authStateHolder.confirmEmailVerification(
                     email = draft.email,
                     verificationCode = verificationCode,

@@ -27,6 +27,7 @@ import platform.Foundation.NSUserDefaults
 import platform.Security.SecItemAdd
 import platform.Security.SecItemCopyMatching
 import platform.Security.SecItemDelete
+import platform.Security.errSecItemNotFound
 import platform.Security.errSecSuccess
 import platform.Security.kSecAttrAccessible
 import platform.Security.kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
@@ -44,159 +45,350 @@ internal actual object SessionStore {
         get() = NSUserDefaults.standardUserDefaults
 
     actual suspend fun read(): SessionSnapshot {
-        ensureInstallMarker()
-
-        val accessToken = IosKeychain.readString(KeyAccessToken)
-            ?: defaults.stringForKey(KeyAccessToken)
-        val refreshToken = IosKeychain.readString(KeyRefreshToken)
-            ?: defaults.stringForKey(KeyRefreshToken)
-        val tokenType = IosKeychain.readString(KeyTokenType)
-            ?: defaults.stringForKey(KeyTokenType)
-        val accessTokenExpiresIn = IosKeychain.readString(KeyAccessTokenExpiresIn)?.toLongOrNull()
-            ?: defaults.integerForKey(KeyAccessTokenExpiresIn)
-        val refreshTokenExpiresIn = IosKeychain.readString(KeyRefreshTokenExpiresIn)?.toLongOrNull()
-            ?: defaults.integerForKey(KeyRefreshTokenExpiresIn)
-
-        val snapshot = SessionSnapshot(
-            onboardingCompleted = defaults.boolForKey(KeyOnboardingCompleted),
-            homeGuideCompleted = defaults.boolForKey(KeyHomeGuideCompleted),
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-            tokenType = tokenType,
-            nickname = defaults.stringForKey(KeyNickname),
-            accessTokenExpiresIn = accessTokenExpiresIn,
-            refreshTokenExpiresIn = refreshTokenExpiresIn,
-        )
-
-        if (snapshot.isLoggedIn && !IosKeychain.hasAuthTokenPair()) {
-            if (saveAuthFields(snapshot)) {
-                removeLegacyAuthFields()
-            }
+        val onboardingCompleted = defaults.boolForKey(KeyOnboardingCompleted)
+        val homeGuideCompleted = defaults.boolForKey(KeyHomeGuideCompleted)
+        if (!ensureInstallCleanupReadyForRead()) {
+            return emptySessionSnapshot(
+                onboardingCompleted = onboardingCompleted,
+                homeGuideCompleted = homeGuideCompleted,
+            )
         }
-
-        return snapshot
+        if (isAuthInvalidated()) {
+            attemptAuthCleanup(clearInvalidationMarkerOnSuccess = true)
+            return emptySessionSnapshot(
+                onboardingCompleted = onboardingCompleted,
+                homeGuideCompleted = homeGuideCompleted,
+            )
+        }
+        val payload = readPersistedAuthPayload(recoverOnFailure = true)
+        return payload?.toSessionSnapshot(
+            onboardingCompleted = onboardingCompleted,
+            homeGuideCompleted = homeGuideCompleted,
+        ) ?: emptySessionSnapshot(
+            onboardingCompleted = onboardingCompleted,
+            homeGuideCompleted = homeGuideCompleted,
+        )
     }
 
     actual suspend fun saveOnboardingCompleted() {
-        defaults.setBool(true, KeyOnboardingCompleted)
-        defaults.synchronize()
+        writeDefaults(message = "Failed to persist onboarding completion state.") {
+            setBool(true, KeyOnboardingCompleted)
+        }
     }
 
     actual suspend fun saveHomeGuideCompleted() {
-        defaults.setBool(true, KeyHomeGuideCompleted)
-        defaults.synchronize()
+        writeDefaults(message = "Failed to persist home-guide completion state.") {
+            setBool(true, KeyHomeGuideCompleted)
+        }
     }
 
     actual suspend fun saveAuth(tokenData: AuthTokenData) {
-        val nickname = tokenData.user?.nickname
-            ?: defaults.stringForKey(KeyNickname)
-        defaults.setBool(true, KeyOnboardingCompleted)
-        if (nickname != null) {
-            defaults.setObject(nickname, KeyNickname)
-        } else {
-            defaults.removeObjectForKey(KeyNickname)
+        if (!ensureInstallCleanupReadyForWrite()) {
+            throw SessionStorageException("iOS auth cleanup is still pending after reinstall.")
         }
-        val savedToKeychain = saveAuthFields(
-            accessToken = tokenData.accessToken,
-            refreshToken = tokenData.refreshToken,
-            tokenType = tokenData.tokenType,
-            accessTokenExpiresIn = tokenData.accessTokenExpiresIn,
-            refreshTokenExpiresIn = tokenData.refreshTokenExpiresIn,
-        )
-        if (savedToKeychain) {
-            removeLegacyAuthFields()
-        } else {
-            saveLegacyAuthFields(tokenData)
+        if (isAuthInvalidated() && !attemptAuthCleanup(clearInvalidationMarkerOnSuccess = true)) {
+            throw SessionStorageException("iOS auth invalidation cleanup is still pending.")
         }
-        defaults.synchronize()
+
+        val existingNickname = readCurrentPersistedNickname()
+        val serializedPayload = try {
+            SessionStorageJson.encodeToString(
+                PersistedAuthPayload.serializer(),
+                tokenData.toPersistedAuthPayload(existingNickname = existingNickname),
+            )
+        } catch (cause: Throwable) {
+            throw SessionStorageException("Failed to encode iOS auth state.", cause)
+        }
+
+        beginAuthInvalidation()
+        if (!IosKeychain.saveString(KeyAuthPayload, serializedPayload)) {
+            handleWriteFailure("Failed to save iOS auth state to Keychain.")
+        }
+        if (!clearLegacySecureAuth()) {
+            handleWriteFailure("Failed to remove legacy iOS Keychain auth state.")
+        }
+        try {
+            writeDefaults(message = "Failed to persist iOS auth session state.") {
+                setBool(true, KeyOnboardingCompleted)
+                setBool(true, KeyInstallMarker)
+                removeLegacyDefaultsAuth()
+                removeObjectForKey(KeyAuthInvalidationPending)
+            }
+        } catch (cause: Throwable) {
+            handleWriteFailure(
+                message = "Failed to persist iOS auth session state.",
+                cause = cause,
+            )
+        }
     }
 
     actual suspend fun clearAuth() {
-        clearAuthFields()
-        defaults.synchronize()
+        beginAuthInvalidation()
+        attemptAuthCleanup(clearInvalidationMarkerOnSuccess = true)
     }
 
-    private fun ensureInstallMarker() {
-        if (defaults.boolForKey(KeyInstallMarker)) return
-
-        if (!hasLocalInstallState()) {
-            clearAuthFields()
+    private fun ensureInstallCleanupReadyForRead(): Boolean {
+        if (defaults.boolForKey(KeyInstallMarker)) {
+            return true
         }
-        defaults.setBool(true, KeyInstallMarker)
-        defaults.synchronize()
+        if (hasLocalInstallState()) {
+            return runCatching {
+                writeDefaults(message = "Failed to persist iOS install marker.") {
+                    setBool(true, KeyInstallMarker)
+                }
+            }.isSuccess
+        }
+        val cleaned = attemptAuthCleanup(clearInvalidationMarkerOnSuccess = false)
+        if (!cleaned) {
+            return false
+        }
+        return runCatching {
+            writeDefaults(message = "Failed to persist iOS install marker.") {
+                setBool(true, KeyInstallMarker)
+            }
+        }.isSuccess
     }
+
+    private fun ensureInstallCleanupReadyForWrite(): Boolean =
+        ensureInstallCleanupReadyForRead()
 
     private fun hasLocalInstallState(): Boolean =
         defaults.boolForKey(KeyOnboardingCompleted) ||
             defaults.boolForKey(KeyHomeGuideCompleted) ||
             defaults.stringForKey(KeyNickname) != null ||
             defaults.stringForKey(KeyAccessToken) != null ||
-            defaults.stringForKey(KeyRefreshToken) != null
+            defaults.stringForKey(KeyRefreshToken) != null ||
+            defaults.boolForKey(KeyAuthInvalidationPending)
 
-    private fun clearAuthFields() {
-        IosKeychain.delete(KeyAccessToken)
-        IosKeychain.delete(KeyRefreshToken)
-        IosKeychain.delete(KeyTokenType)
-        IosKeychain.delete(KeyAccessTokenExpiresIn)
-        IosKeychain.delete(KeyRefreshTokenExpiresIn)
-        listOf(
+    private fun readCurrentPersistedNickname(): String? =
+        readPersistedAuthPayload(recoverOnFailure = false)?.nickname ?: defaults.stringForKey(KeyNickname)
+
+    private fun readPersistedAuthPayload(recoverOnFailure: Boolean): PersistedAuthPayload? {
+        val storedPayload = IosKeychain.readString(KeyAuthPayload)
+        if (storedPayload != null) {
+            val payload = try {
+                SessionStorageJson.decodeFromString(PersistedAuthPayload.serializer(), storedPayload)
+            } catch (cause: Throwable) {
+                return recoverAuthReadFailure(
+                    message = "Failed to decode iOS auth state.",
+                    cause = cause,
+                    recoverOnFailure = recoverOnFailure,
+                )
+            }
+            if (hasLegacyDefaultsAuth() || hasLegacySecureAuth()) {
+                return try {
+                    beginAuthInvalidation()
+                    if (!clearLegacySecureAuth()) {
+                        throw SessionStorageException("Failed to remove legacy iOS Keychain auth state.")
+                    }
+                    writeDefaults(message = "Failed to remove legacy iOS auth state.") {
+                        removeLegacyDefaultsAuth()
+                        removeObjectForKey(KeyAuthInvalidationPending)
+                    }
+                    payload
+                } catch (cause: Throwable) {
+                    recoverAuthReadFailure(
+                        message = "Failed to remove legacy iOS auth state.",
+                        cause = cause,
+                        recoverOnFailure = recoverOnFailure,
+                    )
+                }
+            }
+            return payload
+        }
+
+        val legacyKeychainState = resolveLegacyAuthState(
+            accessToken = IosKeychain.readString(KeyAccessToken),
+            refreshToken = IosKeychain.readString(KeyRefreshToken),
+            tokenType = IosKeychain.readString(KeyTokenType),
+            nickname = IosKeychain.readString(KeyNickname) ?: defaults.stringForKey(KeyNickname),
+            accessTokenExpiresIn = IosKeychain.readString(KeyAccessTokenExpiresIn)?.toLongOrNull(),
+            refreshTokenExpiresIn = IosKeychain.readString(KeyRefreshTokenExpiresIn)?.toLongOrNull(),
+        )
+        if (legacyKeychainState != LegacyAuthState.Empty) {
+            return migrateLegacyAuthState(
+                state = legacyKeychainState,
+                recoverOnFailure = recoverOnFailure,
+            )
+        }
+
+        val legacyDefaultsState = resolveLegacyAuthState(
+            accessToken = defaults.stringForKey(KeyAccessToken),
+            refreshToken = defaults.stringForKey(KeyRefreshToken),
+            tokenType = defaults.stringForKey(KeyTokenType),
+            nickname = defaults.stringForKey(KeyNickname),
+            accessTokenExpiresIn = defaults.longOrNull(KeyAccessTokenExpiresIn),
+            refreshTokenExpiresIn = defaults.longOrNull(KeyRefreshTokenExpiresIn),
+        )
+        return migrateLegacyAuthState(
+            state = legacyDefaultsState,
+            recoverOnFailure = recoverOnFailure,
+        )
+    }
+
+    private fun migrateLegacyAuthState(
+        state: LegacyAuthState,
+        recoverOnFailure: Boolean,
+    ): PersistedAuthPayload? = when (state) {
+        LegacyAuthState.Empty -> null
+        LegacyAuthState.Invalid -> {
+            try {
+                beginAuthInvalidation()
+                val cleaned = attemptAuthCleanup(clearInvalidationMarkerOnSuccess = true)
+                if (!cleaned) {
+                    throw SessionStorageException("Failed to clear invalid legacy iOS auth state.")
+                }
+                null
+            } catch (cause: Throwable) {
+                recoverAuthReadFailure(
+                    message = "Failed to clear invalid legacy iOS auth state.",
+                    cause = cause,
+                    recoverOnFailure = recoverOnFailure,
+                )
+            }
+        }
+        is LegacyAuthState.Migratable -> {
+            val payload = state.payload
+            val serializedPayload = try {
+                SessionStorageJson.encodeToString(PersistedAuthPayload.serializer(), payload)
+            } catch (cause: Throwable) {
+                return recoverAuthReadFailure(
+                    message = "Failed to encode migrated iOS auth state.",
+                    cause = cause,
+                    recoverOnFailure = recoverOnFailure,
+                )
+            }
+            beginAuthInvalidation()
+            if (!IosKeychain.saveString(KeyAuthPayload, serializedPayload)) {
+                return recoverAuthReadFailure(
+                    message = "Failed to migrate iOS auth state to Keychain.",
+                    cause = IllegalStateException("Keychain write returned false."),
+                    recoverOnFailure = recoverOnFailure,
+                )
+            }
+            return try {
+                if (!clearLegacySecureAuth()) {
+                    throw SessionStorageException("Failed to remove legacy iOS Keychain auth state.")
+                }
+                writeDefaults(message = "Failed to remove legacy iOS auth state.") {
+                    removeLegacyDefaultsAuth()
+                    removeObjectForKey(KeyAuthInvalidationPending)
+                }
+                payload
+            } catch (cause: Throwable) {
+                recoverAuthReadFailure(
+                    message = "Failed to remove legacy iOS auth state.",
+                    cause = cause,
+                    recoverOnFailure = recoverOnFailure,
+                )
+            }
+        }
+    }
+
+    private fun recoverAuthReadFailure(
+        message: String,
+        cause: Throwable,
+        recoverOnFailure: Boolean,
+    ): PersistedAuthPayload? {
+        runCatching { beginAuthInvalidation() }
+        attemptAuthCleanup(clearInvalidationMarkerOnSuccess = false)
+        if (recoverOnFailure) {
+            return null
+        }
+        throw SessionStorageException(message, cause)
+    }
+
+    private fun handleWriteFailure(
+        message: String,
+        cause: Throwable? = null,
+    ): Nothing {
+        attemptAuthCleanup(clearInvalidationMarkerOnSuccess = false)
+        throw SessionStorageException(message, cause)
+    }
+
+    private fun beginAuthInvalidation() {
+        writeDefaults(message = "Failed to invalidate iOS auth state.") {
+            setBool(true, KeyAuthInvalidationPending)
+        }
+    }
+
+    private fun isAuthInvalidated(): Boolean =
+        defaults.boolForKey(KeyAuthInvalidationPending)
+
+    private fun attemptAuthCleanup(clearInvalidationMarkerOnSuccess: Boolean): Boolean {
+        val secureCleared = IosKeychain.delete(KeyAuthPayload) && clearLegacySecureAuth()
+        defaults.removeLegacyDefaultsAuth()
+        val defaultsCleared = defaults.synchronize()
+        val markerCleared = if (clearInvalidationMarkerOnSuccess && secureCleared && defaultsCleared) {
+            defaults.removeObjectForKey(KeyAuthInvalidationPending)
+            defaults.synchronize()
+        } else {
+            true
+        }
+        return secureCleared && defaultsCleared && markerCleared
+    }
+
+    private fun clearLegacySecureAuth(): Boolean =
+        IosKeychain.delete(KeyAccessToken) &&
+            IosKeychain.delete(KeyRefreshToken) &&
+            IosKeychain.delete(KeyTokenType) &&
+            IosKeychain.delete(KeyNickname) &&
+            IosKeychain.delete(KeyAccessTokenExpiresIn) &&
+            IosKeychain.delete(KeyRefreshTokenExpiresIn)
+
+    private fun hasLegacySecureAuth(): Boolean =
+        IosKeychain.hasAny(
             KeyAccessToken,
             KeyRefreshToken,
             KeyTokenType,
             KeyNickname,
             KeyAccessTokenExpiresIn,
             KeyRefreshTokenExpiresIn,
-        ).forEach(defaults::removeObjectForKey)
-    }
-
-    private fun saveAuthFields(snapshot: SessionSnapshot): Boolean {
-        val accessToken = snapshot.accessToken ?: return false
-        val refreshToken = snapshot.refreshToken ?: return false
-        val tokenType = snapshot.tokenType ?: return false
-        return saveAuthFields(
-            accessToken = accessToken,
-            refreshToken = refreshToken,
-            tokenType = tokenType,
-            accessTokenExpiresIn = snapshot.accessTokenExpiresIn,
-            refreshTokenExpiresIn = snapshot.refreshTokenExpiresIn,
         )
+
+    private fun hasLegacyDefaultsAuth(): Boolean =
+        resolveLegacyAuthState(
+            accessToken = defaults.stringForKey(KeyAccessToken),
+            refreshToken = defaults.stringForKey(KeyRefreshToken),
+            tokenType = defaults.stringForKey(KeyTokenType),
+            nickname = defaults.stringForKey(KeyNickname),
+            accessTokenExpiresIn = defaults.longOrNull(KeyAccessTokenExpiresIn),
+            refreshTokenExpiresIn = defaults.longOrNull(KeyRefreshTokenExpiresIn),
+        ) != LegacyAuthState.Empty
+
+    private fun NSUserDefaults.longOrNull(key: String): Long? =
+        if (objectForKey(key) != null) integerForKey(key) else null
+
+    private fun NSUserDefaults.removeLegacyDefaultsAuth() {
+        removeObjectForKey(KeyAccessToken)
+        removeObjectForKey(KeyRefreshToken)
+        removeObjectForKey(KeyTokenType)
+        removeObjectForKey(KeyNickname)
+        removeObjectForKey(KeyAccessTokenExpiresIn)
+        removeObjectForKey(KeyRefreshTokenExpiresIn)
     }
 
-    private fun saveAuthFields(
-        accessToken: String,
-        refreshToken: String,
-        tokenType: String,
-        accessTokenExpiresIn: Long,
-        refreshTokenExpiresIn: Long,
-    ): Boolean = listOf(
-        IosKeychain.saveString(KeyAccessToken, accessToken),
-        IosKeychain.saveString(KeyRefreshToken, refreshToken),
-        IosKeychain.saveString(KeyTokenType, tokenType),
-        IosKeychain.saveString(KeyAccessTokenExpiresIn, accessTokenExpiresIn.toString()),
-        IosKeychain.saveString(KeyRefreshTokenExpiresIn, refreshTokenExpiresIn.toString()),
-    ).all { it }
-
-    private fun saveLegacyAuthFields(tokenData: AuthTokenData) {
-        defaults.setObject(tokenData.accessToken, KeyAccessToken)
-        defaults.setObject(tokenData.refreshToken, KeyRefreshToken)
-        defaults.setObject(tokenData.tokenType, KeyTokenType)
-        defaults.setInteger(tokenData.accessTokenExpiresIn, KeyAccessTokenExpiresIn)
-        defaults.setInteger(tokenData.refreshTokenExpiresIn, KeyRefreshTokenExpiresIn)
-    }
-
-    private fun removeLegacyAuthFields() {
-        listOf(
-            KeyAccessToken,
-            KeyRefreshToken,
-            KeyTokenType,
-            KeyAccessTokenExpiresIn,
-            KeyRefreshTokenExpiresIn,
-        ).forEach(defaults::removeObjectForKey)
+    private fun writeDefaults(
+        message: String,
+        block: NSUserDefaults.() -> Unit,
+    ) {
+        runCatching {
+            defaults.run(block)
+            defaults.synchronize()
+        }.getOrElse { cause ->
+            throw SessionStorageException(message, cause)
+        }.also { synchronized ->
+            if (!synchronized) {
+                throw SessionStorageException(message)
+            }
+        }
     }
 
     private const val KeyOnboardingCompleted = "onboarding_completed"
     private const val KeyHomeGuideCompleted = "home_guide_completed"
     private const val KeyInstallMarker = "install_marker"
+    private const val KeyAuthInvalidationPending = "auth_invalidation_pending"
+    private const val KeyAuthPayload = "auth_payload"
     private const val KeyAccessToken = "access_token"
     private const val KeyRefreshToken = "refresh_token"
     private const val KeyTokenType = "token_type"
@@ -210,9 +402,8 @@ private object IosKeychain {
     private const val Service = "com.f1.quiket.session"
     private const val KeychainFailureStatus = -1
 
-    fun hasAuthTokenPair(): Boolean =
-        !readString("access_token").isNullOrBlank() &&
-            !readString("refresh_token").isNullOrBlank()
+    fun hasAny(vararg accounts: String): Boolean =
+        accounts.any { !readString(it).isNullOrBlank() }
 
     fun readString(account: String): String? = memScoped {
         val result = alloc<COpaquePointerVar>()
@@ -230,7 +421,9 @@ private object IosKeychain {
     }
 
     fun saveString(account: String, value: String): Boolean {
-        delete(account)
+        if (!delete(account)) {
+            return false
+        }
         val bytes = value.encodeToByteArray()
         val data = bytes.usePinned { pinned ->
             CFDataCreate(
@@ -248,11 +441,11 @@ private object IosKeychain {
         return status == errSecSuccess
     }
 
-    fun delete(account: String) {
-        withQuery(account, Unit) { query ->
+    fun delete(account: String): Boolean {
+        val status = withQuery(account, KeychainFailureStatus) { query ->
             SecItemDelete(query)
-            Unit
         }
+        return status == errSecSuccess || status == errSecItemNotFound
     }
 
     private inline fun <T> withQuery(

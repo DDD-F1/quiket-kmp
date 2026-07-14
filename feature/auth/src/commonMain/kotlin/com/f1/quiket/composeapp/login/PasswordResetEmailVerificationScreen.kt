@@ -39,6 +39,7 @@ import com.f1.quiket.composeapp.designsystem.QuiketGray950
 import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.network.toUserFacingMessage
+import com.f1.quiket.composeapp.util.runSuspendCatching
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -74,7 +75,7 @@ fun PasswordResetEmailVerificationRoute(
         emailErrorMessage = null
         verificationCodeErrorMessage = null
         coroutineScope.launch {
-            runCatching {
+            runSuspendCatching {
                 authStateHolder.requestPasswordReset(trimmedEmail)
             }.onSuccess { result ->
                 email = result.email
