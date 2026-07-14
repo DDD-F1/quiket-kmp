@@ -47,6 +47,7 @@ import com.f1.quiket.composeapp.designsystem.QuiketPrimaryButton
 import com.f1.quiket.composeapp.designsystem.QuiketTextField
 import com.f1.quiket.composeapp.designsystem.QuiketWhite
 import com.f1.quiket.composeapp.network.toUserFacingMessage
+import com.f1.quiket.composeapp.util.runSuspendCatching
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -95,7 +96,7 @@ fun SignUpCredentialsRoute(
         emailErrorMessage = null
         showEmailAvailableMessage = false
         coroutineScope.launch {
-            runCatching {
+            runSuspendCatching {
                 authStateHolder.checkEmailAvailability(trimmedEmail)
             }.onSuccess { result ->
                 isEmailAvailable = result.available

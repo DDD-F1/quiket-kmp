@@ -11,6 +11,7 @@ import com.f1.quiket.composeapp.auth.domain.model.PasswordResetRequested
 import com.f1.quiket.composeapp.auth.domain.model.SignupData
 import com.f1.quiket.composeapp.auth.domain.repository.AuthRepository
 import com.f1.quiket.composeapp.auth.domain.repository.SessionRepository
+import com.f1.quiket.composeapp.util.runSuspendCatching
 
 data class CompletedLogin(
     val nickname: String,
@@ -217,7 +218,7 @@ internal class LogoutUseCase(
         val session = sessionRepository.read()
         sessionRepository.clearAuth()
         if (session.isLoggedIn) {
-            runCatching {
+            runSuspendCatching {
                 authRepository.logout(session)
             }
         }
