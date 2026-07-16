@@ -323,7 +323,7 @@ internal class TextLectureUploadStateHolder(
             }
         }.onFailure { error ->
             if (error is SubjectException && error.isUnauthorized) {
-                onSessionExpired()
+                handleSessionExpired(onSessionExpired)
             } else {
                 isUploading = false
                 isError = true
@@ -423,7 +423,7 @@ internal class TextLectureUploadStateHolder(
                 }
             }.onFailure { error ->
                 if (error is SubjectException && error.isUnauthorized) {
-                    onSessionExpired()
+                    handleSessionExpired(onSessionExpired)
                     return
                 }
                 consecutiveFailureCount += 1
@@ -435,6 +435,15 @@ internal class TextLectureUploadStateHolder(
         }
 
         onFailed("자료 분석 시간이 예상보다 길어지고 있어요. 잠시 후 과목 화면에서 다시 확인해주세요.")
+    }
+
+    private fun handleSessionExpired(onSessionExpired: () -> Unit) {
+        isUploading = false
+        isError = false
+        uploadFailed = false
+        progressPercent = 0
+        feedbackMessage = null
+        onSessionExpired()
     }
 
     private fun showError(message: String) {

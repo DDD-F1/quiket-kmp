@@ -4,16 +4,25 @@ import android.content.Context
 import android.content.SharedPreferences
 
 object AndroidSessionContext {
+    private const val GeneralPreferencesName = "quiket_cmp_session"
+    private const val SecurePreferencesName = "quiket_cmp_secure_session"
+
     private var applicationContext: Context? = null
 
     fun init(context: Context) {
         applicationContext = context.applicationContext
     }
 
-    fun preferences(): SharedPreferences {
-        val context = checkNotNull(applicationContext) {
+    fun contextOrNull(): Context? = applicationContext
+
+    fun context(): Context =
+        checkNotNull(applicationContext) {
             "AndroidSessionContext.init(context) must be called before reading session state."
         }
-        return context.getSharedPreferences("quiket_cmp_session", Context.MODE_PRIVATE)
-    }
+
+    fun generalPreferences(): SharedPreferences =
+        context().getSharedPreferences(GeneralPreferencesName, Context.MODE_PRIVATE)
+
+    fun securePreferences(): SharedPreferences =
+        context().getSharedPreferences(SecurePreferencesName, Context.MODE_PRIVATE)
 }

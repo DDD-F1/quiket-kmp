@@ -68,6 +68,7 @@ import com.f1.quiket.composeapp.navigation.popToOrReplaceWith
 import com.f1.quiket.composeapp.navigation.replaceAllWith
 import com.f1.quiket.composeapp.navigation.replaceTopWith
 import com.f1.quiket.composeapp.onboarding.OnboardingScreen
+import com.f1.quiket.composeapp.util.runSuspendCatching
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
@@ -140,7 +141,15 @@ fun QuiketApp(
             }
         }
 
-        val session = authStateHolder.readSession()
+        val session = runSuspendCatching {
+            authStateHolder.readSession()
+        }.getOrElse {
+            awaitSplashMinimumDuration()
+            loggedInNickname = null
+            appBackStack.replaceAllWith(AppDestination.Login)
+            isBootstrapping = false
+            return@LaunchedEffect
+        }
         mainHomeGuideCompleted = session.homeGuideCompleted
         val fallbackDestination: AppDestination = if (session.onboardingCompleted) {
             AppDestination.Login
@@ -155,7 +164,7 @@ fun QuiketApp(
             return@LaunchedEffect
         }
 
-        val meResult = runCatching { authStateHolder.getCurrentUser() }
+        val meResult = runSuspendCatching { authStateHolder.getCurrentUser() }
         awaitSplashMinimumDuration()
         meResult
             .onSuccess { user ->
@@ -164,7 +173,7 @@ fun QuiketApp(
             }
             .onFailure { error ->
                 if (error is AuthException && error.isUnauthorized) {
-                    authStateHolder.clearAuth()
+                    runSuspendCatching { authStateHolder.clearAuth() }
                 }
                 loggedInNickname = null
                 appBackStack.replaceAllWith(fallbackDestination)
@@ -221,7 +230,7 @@ fun QuiketApp(
             kakaoLoginLauncher { accessToken, errorMessage ->
                 coroutineScope.launch {
                     if (!accessToken.isNullOrBlank()) {
-                        runCatching {
+                        runSuspendCatching {
                             handleServerKakaoLogin(accessToken)
                         }.onFailure { error ->
                             kakaoErrorMessage = error.toUserFacingMessage("카카오 로그인에 실패했습니다.")
@@ -282,7 +291,7 @@ fun QuiketApp(
             appleLoginLauncher { identityToken, authorizationCode, fullName, errorMessage ->
                 coroutineScope.launch {
                     if (!identityToken.isNullOrBlank()) {
-                        runCatching {
+                        runSuspendCatching {
                             handleServerAppleLogin(
                                 identityToken = identityToken,
                                 authorizationCode = authorizationCode?.takeIf { it.isNotBlank() },
@@ -392,7 +401,7 @@ fun QuiketApp(
                             loginErrorMessage = null
                             coroutineScope.launch {
                                 val trimmedEmail = email.trim()
-                                runCatching {
+                                runSuspendCatching {
                                     val tokenData = authStateHolder.login(
                                         email = trimmedEmail,
                                         password = password,
@@ -425,7 +434,7 @@ fun QuiketApp(
                                                 val verificationEmail = error.email?.takeIf { it.isNotBlank() } ?: trimmedEmail
                                                 signupDraft = signupDraft.copy(email = verificationEmail)
                                                 signUpCodeBackDestination = AppDestination.EmailLogin
-                                                runCatching {
+                                                runSuspendCatching {
                                                     authStateHolder.resendEmailVerification(verificationEmail)
                                                 }
                                                 loginErrorMessage = null
@@ -588,7 +597,7 @@ fun QuiketApp(
                             signupSubmitErrorMessage = null
                             isSignupSubmitting = true
                             coroutineScope.launch {
-                                runCatching {
+                                runSuspendCatching {
                                     authStateHolder.signup(
                                         email = submitDraft.email,
                                         password = submitDraft.password,
@@ -632,7 +641,7 @@ fun QuiketApp(
                     initialHomeGuideCompleted = mainHomeGuideCompleted,
                     onLogout = {
                         coroutineScope.launch {
-                            authStateHolder.logout()
+                            runSuspendCatching { authStateHolder.logout() }
                             loggedInNickname = null
                             oauthAuthDraft = OAuthAuthDraft()
                             kakaoErrorMessage = null
@@ -645,7 +654,7 @@ fun QuiketApp(
                     },
                     onSessionExpired = {
                         coroutineScope.launch {
-                            authStateHolder.clearAuth()
+                            runSuspendCatching { authStateHolder.clearAuth() }
                             loggedInNickname = null
                             appBackStack.replaceAllWith(AppDestination.Login)
                         }
